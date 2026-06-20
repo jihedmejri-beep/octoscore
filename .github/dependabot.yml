@@ -1,0 +1,17 @@
+# Dependabot keeps dependencies patched: it opens PRs for security fixes and
+# version bumps. Two ecosystems — the frontend (root) and the backend (server).
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "frontend"]
+
+  - package-ecosystem: "npm"
+    directory: "/server"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "backend"]

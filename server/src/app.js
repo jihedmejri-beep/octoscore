@@ -3,6 +3,8 @@ import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
 import morgan from "morgan";
+import mongoSanitize from "express-mongo-sanitize";
+import rateLimit from "express-rate-limit";
 
 import apiRoutes from "./routes/index.js";
 import { cache, invalidateOnWrite } from "./middleware/cache.js";
@@ -19,6 +21,11 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(compression()); // gzip JSON responses — ~5x less bandwidth under load
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
+
+// Strip any keys containing "$" or "." from req.body/query/params so a payload
+// like { "email": { "$gt": "" } } can never reach Mongo as an operator
+// (NoSQL-injection defense). Replaces offending chars with "_".
+app.use(mongoSanitize({ replaceWith: "_" }));
 
 if (process.env.NODE_ENV !== "production") app.use(morgan("dev"));
 
@@ -54,6 +61,21 @@ app.use(
 
 // --- Health check (Railway) -------------------------------------------------
 app.get("/health", (req, res) => res.json({ status: "ok", uptime: process.uptime() }));
+
+// --- Global API throttle ----------------------------------------------------
+// Coarse per-IP cap across the whole API to blunt flood/abuse (sits on top of
+// the stricter auth limiter). Generous enough for normal browsing thanks to
+// the response cache; trips only on abnormal request volume. Health check and
+// preflight (OPTIONS) are exempt so monitors and CORS aren't throttled.
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 120, // ~2 req/sec sustained per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === "OPTIONS",
+  message: { message: "Too many requests — please slow down" },
+});
+app.use("/api", apiLimiter);
 
 // --- API -------------------------------------------------------------------
 // invalidateOnWrite flushes the cache after admin mutations; cache serves
