@@ -1,0 +1,196 @@
+{
+  "common": {
+    "comingSoon": "Coming Soon"
+  },
+  "nav": {
+    "home": "Home",
+    "tournament": "Tournament",
+    "matches": "Matches",
+    "teams": "Teams",
+    "quiz": "Quiz"
+  },
+  "search": {
+    "label": "Search",
+    "placeholder": "Search teams, players, coaches…",
+    "teams": "Teams",
+    "players": "Players",
+    "coaches": "Coaches",
+    "prompt": "Search for a team, player or coach",
+    "noResults": "No results for"
+  },
+  "hero": {
+    "badge": "Season 2026 · Live Standings",
+    "titleTop": "Octopus",
+    "titleBottom": "Tournament",
+    "lede": "The 2026 Summer Championship — {{teams}} elite teams battle across two groups for one trophy. Follow live scores, standings, and the race for the golden boot.",
+    "teams": "Teams",
+    "groups": "Groups",
+    "matches": "Matches",
+    "ctaStandings": "View Standings",
+    "ctaScorers": "Top Scorers"
+  },
+  "home": {
+    "liveNow": "Live Now",
+    "recentResults": "Recent Results",
+    "topScorers": "Top Scorers",
+    "upcoming": "Upcoming Matches",
+    "seeAll": "See all",
+    "showLess": "Show less",
+    "rules": "Tournament Rules",
+    "goals": "goals",
+    "noLive": "No live matches right now"
+  },
+  "match": {
+    "upcoming": "Upcoming",
+    "live": "Live",
+    "finished": "Finished",
+    "watch": "Watch Live"
+  },
+  "tournament": {
+    "title": "Octopus Championship",
+    "subtitle": "Convergence of the Elite: Sousse vs Teboulba",
+    "path": "Path",
+    "quarterfinals": "Quarterfinals",
+    "semifinals": "Semifinals",
+    "groupFinal": "Group Final",
+    "final": "Final",
+    "groupWinner": "Group Winner",
+    "grandFinal": "Grand Final",
+    "viewFinal": "View Grand Final"
+  },
+  "matches": {
+    "final": "Final",
+    "allGroups": "All",
+    "allStatus": "All",
+    "noMatches": "No matches found"
+  },
+  "matchDetail": {
+    "backToMatches": "Back to Matches",
+    "watchLive": "Watch Live Stream",
+    "prediction": "Prediction Survey",
+    "win": "Win",
+    "draw": "Draw",
+    "loss": "Loss",
+    "headToHead": "Head to Head",
+    "noHistory": "No previous meetings",
+    "lineup": "Starting Lineup",
+    "substitute": "Substitute",
+    "coach": "Coach",
+    "notFound": "Match not found"
+  },
+  "predict": {
+    "title": "Match Prediction",
+    "whoWins": "Who will win?",
+    "community": "Community Predictions",
+    "yourPrediction": "Your prediction",
+    "submit": "Submit prediction",
+    "update": "Update prediction",
+    "submitting": "Saving…",
+    "saved": "Your prediction is saved",
+    "signInToPredict": "Sign in to predict",
+    "beFirst": "Be the first to predict this match",
+    "votes": "predictions",
+    "closed": "Predictions are closed",
+    "correct": "Correct!",
+    "missed": "Not this time",
+    "rewardHint": "Correct pick +25 XP"
+  },
+  "teams": {
+    "all": "All",
+    "notFound": "Team not found",
+    "backToTeams": "Back to Teams"
+  },
+  "gallery": {
+    "title": "Tournament Memories",
+    "subtitle": "Moments that made the season",
+    "view": "View",
+    "of": "of",
+    "download": "Download",
+    "noImage": "Photo coming soon"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "createAccount": "Create Account",
+    "welcomeBack": "Welcome back",
+    "joinTitle": "Join OctoScore",
+    "signInSub": "Sign in to predict, play and earn XP.",
+    "signUpSub": "Create an account to join the tournament.",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "namePlaceholder": "Your name",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "At least 6 characters",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "signOut": "Sign Out",
+    "profile": "Profile",
+    "adminPanel": "Admin Panel",
+    "adminBadge": "Admin",
+    "loading": "Please wait…",
+    "guest": "Guest",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "unverified": "Email not verified",
+    "resend": "Resend verification email",
+    "resent": "Verification email sent — check your inbox.",
+    "forgotPassword": "Forgot password?",
+    "forgotTitle": "Reset password",
+    "forgotSub": "Enter your email and we'll send you a reset link.",
+    "sendResetLink": "Send reset link",
+    "resetSent": "If that email is registered, a reset link is on its way. Check your inbox.",
+    "backToSignIn": "Back to sign in",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "capsLock": "Caps Lock is on"
+  },
+  "reset": {
+    "title": "Set a new password",
+    "sub": "Choose a new password for your account.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "submit": "Update password",
+    "updating": "Updating…",
+    "successTitle": "Password updated",
+    "successBody": "Your password has been changed and you're now signed in.",
+    "mismatch": "Passwords don't match.",
+    "missing": "No reset token found in this link.",
+    "backHome": "Back to Home",
+    "continue": "Continue"
+  },
+  "verify": {
+    "verifying": "Verifying your email…",
+    "successTitle": "Email verified",
+    "successBody": "Your account is now verified. Welcome to OctoScore!",
+    "errorTitle": "Verification failed",
+    "errorBody": "This verification link is invalid or has expired.",
+    "missing": "No verification token found in this link.",
+    "backHome": "Back to Home"
+  },
+  "teamDetail": {
+    "lineup": "Starting Lineup",
+    "squad": "Squad",
+    "coach": "Coach",
+    "headCoach": "Head Coach"
+  },
+  "player": {
+    "number": "Number",
+    "position": "Position",
+    "goals": "Goals",
+    "captain": "Captain"
+  },
+  "quiz": {
+    "question": "Question",
+    "next": "Next Question",
+    "finish": "Finish",
+    "yourScore": "Your Score",
+    "playAgain": "Play Again",
+    "resultGreat": "Outstanding! You're a true football brain.",
+    "resultGood": "Nice work! Solid football knowledge.",
+    "resultTry": "Keep practising — you'll get there!",
+    "reward": "XP Earned",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  }
+}

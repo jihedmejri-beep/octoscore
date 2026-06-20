@@ -1,0 +1,196 @@
+{
+  "common": {
+    "comingSoon": "Bientôt Disponible"
+  },
+  "nav": {
+    "home": "Accueil",
+    "tournament": "Tournoi",
+    "matches": "Matchs",
+    "teams": "Équipes",
+    "quiz": "Quiz"
+  },
+  "search": {
+    "label": "Rechercher",
+    "placeholder": "Rechercher équipes, joueurs, coachs…",
+    "teams": "Équipes",
+    "players": "Joueurs",
+    "coaches": "Coachs",
+    "prompt": "Recherchez une équipe, un joueur ou un coach",
+    "noResults": "Aucun résultat pour"
+  },
+  "hero": {
+    "badge": "Saison 2026 · Classement en Direct",
+    "titleTop": "Octopus",
+    "titleBottom": "Tournament",
+    "lede": "Le Championnat d'Été 2026 — {{teams}} équipes d'élite s'affrontent dans deux groupes pour un seul trophée. Suivez les scores en direct, le classement et la course au soulier d'or.",
+    "teams": "Équipes",
+    "groups": "Groupes",
+    "matches": "Matchs",
+    "ctaStandings": "Voir le Classement",
+    "ctaScorers": "Meilleurs Buteurs"
+  },
+  "home": {
+    "liveNow": "En Direct",
+    "recentResults": "Résultats Récents",
+    "topScorers": "Meilleurs Buteurs",
+    "upcoming": "Matchs à Venir",
+    "seeAll": "Voir tout",
+    "showLess": "Voir moins",
+    "rules": "Règlement du Tournoi",
+    "goals": "buts",
+    "noLive": "Aucun match en direct pour le moment"
+  },
+  "match": {
+    "upcoming": "À venir",
+    "live": "En direct",
+    "finished": "Terminé",
+    "watch": "Regarder"
+  },
+  "tournament": {
+    "title": "Championnat Octopus",
+    "subtitle": "Convergence de l'Élite : Sousse vs Teboulba",
+    "path": "Parcours",
+    "quarterfinals": "Quarts de Finale",
+    "semifinals": "Demi-finales",
+    "groupFinal": "Finale de Groupe",
+    "final": "Finale",
+    "groupWinner": "Vainqueur du Groupe",
+    "grandFinal": "Grande Finale",
+    "viewFinal": "Voir la Grande Finale"
+  },
+  "matches": {
+    "final": "Finale",
+    "allGroups": "Tous",
+    "allStatus": "Tous",
+    "noMatches": "Aucun match trouvé"
+  },
+  "matchDetail": {
+    "backToMatches": "Retour aux Matchs",
+    "watchLive": "Regarder le Direct",
+    "prediction": "Sondage de Prédiction",
+    "win": "Victoire",
+    "draw": "Nul",
+    "loss": "Défaite",
+    "headToHead": "Confrontations",
+    "noHistory": "Aucune rencontre précédente",
+    "lineup": "Composition",
+    "substitute": "Remplaçant",
+    "coach": "Entraîneur",
+    "notFound": "Match introuvable"
+  },
+  "predict": {
+    "title": "Pronostic du Match",
+    "whoWins": "Qui va gagner ?",
+    "community": "Pronostics de la Communauté",
+    "yourPrediction": "Votre pronostic",
+    "submit": "Envoyer le pronostic",
+    "update": "Modifier le pronostic",
+    "submitting": "Enregistrement…",
+    "saved": "Votre pronostic est enregistré",
+    "signInToPredict": "Connectez-vous pour pronostiquer",
+    "beFirst": "Soyez le premier à pronostiquer ce match",
+    "votes": "pronostics",
+    "closed": "Les pronostics sont clos",
+    "correct": "Bien vu !",
+    "missed": "Pas cette fois",
+    "rewardHint": "Bon pronostic +25 XP"
+  },
+  "teams": {
+    "all": "Toutes",
+    "notFound": "Équipe introuvable",
+    "backToTeams": "Retour aux Équipes"
+  },
+  "gallery": {
+    "title": "Souvenirs du Tournoi",
+    "subtitle": "Les moments forts de la saison",
+    "view": "Voir",
+    "of": "sur",
+    "download": "Télécharger",
+    "noImage": "Photo à venir"
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "createAccount": "Créer un compte",
+    "welcomeBack": "Bon retour",
+    "joinTitle": "Rejoindre OctoScore",
+    "signInSub": "Connectez-vous pour prédire, jouer et gagner des XP.",
+    "signUpSub": "Créez un compte pour rejoindre le tournoi.",
+    "name": "Nom",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "namePlaceholder": "Votre nom",
+    "emailPlaceholder": "vous@exemple.com",
+    "passwordPlaceholder": "Au moins 6 caractères",
+    "noAccount": "Pas de compte ?",
+    "haveAccount": "Déjà un compte ?",
+    "signOut": "Se déconnecter",
+    "profile": "Profil",
+    "adminPanel": "Panneau Admin",
+    "adminBadge": "Admin",
+    "loading": "Veuillez patienter…",
+    "guest": "Invité",
+    "errorGeneric": "Une erreur s'est produite. Réessayez.",
+    "unverified": "E-mail non vérifié",
+    "resend": "Renvoyer l'e-mail de vérification",
+    "resent": "E-mail de vérification envoyé — consultez votre boîte.",
+    "forgotPassword": "Mot de passe oublié ?",
+    "forgotTitle": "Réinitialiser le mot de passe",
+    "forgotSub": "Saisissez votre e-mail et nous vous enverrons un lien de réinitialisation.",
+    "sendResetLink": "Envoyer le lien",
+    "resetSent": "Si cet e-mail est enregistré, un lien de réinitialisation arrive. Consultez votre boîte.",
+    "backToSignIn": "Retour à la connexion",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "capsLock": "Verr. Maj activé"
+  },
+  "reset": {
+    "title": "Nouveau mot de passe",
+    "sub": "Choisissez un nouveau mot de passe pour votre compte.",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "submit": "Mettre à jour",
+    "updating": "Mise à jour…",
+    "successTitle": "Mot de passe mis à jour",
+    "successBody": "Votre mot de passe a été modifié et vous êtes maintenant connecté.",
+    "mismatch": "Les mots de passe ne correspondent pas.",
+    "missing": "Aucun jeton de réinitialisation trouvé dans ce lien.",
+    "backHome": "Retour à l'accueil",
+    "continue": "Continuer"
+  },
+  "verify": {
+    "verifying": "Vérification de votre e-mail…",
+    "successTitle": "E-mail vérifié",
+    "successBody": "Votre compte est maintenant vérifié. Bienvenue sur OctoScore !",
+    "errorTitle": "Échec de la vérification",
+    "errorBody": "Ce lien de vérification est invalide ou a expiré.",
+    "missing": "Aucun jeton de vérification trouvé dans ce lien.",
+    "backHome": "Retour à l'accueil"
+  },
+  "teamDetail": {
+    "lineup": "Composition",
+    "squad": "Effectif",
+    "coach": "Entraîneur",
+    "headCoach": "Entraîneur Principal"
+  },
+  "player": {
+    "number": "Numéro",
+    "position": "Poste",
+    "goals": "Buts",
+    "captain": "Capitaine"
+  },
+  "quiz": {
+    "question": "Question",
+    "next": "Question Suivante",
+    "finish": "Terminer",
+    "yourScore": "Votre Score",
+    "playAgain": "Rejouer",
+    "resultGreat": "Exceptionnel ! Un vrai cerveau du foot.",
+    "resultGood": "Bien joué ! Bonnes connaissances.",
+    "resultTry": "Continuez à vous entraîner — vous y arriverez !",
+    "reward": "XP gagnés",
+    "easy": "Facile",
+    "medium": "Moyen",
+    "hard": "Difficile"
+  }
+}
