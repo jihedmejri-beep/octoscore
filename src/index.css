@@ -102,6 +102,41 @@
     animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: var(--d, 0ms);
   }
+
+  /* Page-transition entrances. The app shell re-keys this wrapper on every
+     route change so the animation replays; the direction (left/right) is
+     chosen in App.jsx to match the swipe. `.page-enter` is the neutral fade
+     used on non-tab routes. All transform/opacity, so GPU-cheap. */
+  .page-enter {
+    animation: fade-up 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .page-enter-from-right {
+    animation: page-slide-right 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .page-enter-from-left {
+    animation: page-slide-left 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes page-slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes page-slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(-26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* ===========================================================================

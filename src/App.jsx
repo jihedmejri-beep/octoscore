@@ -1,7 +1,8 @@
-import { useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+import useTabSwipe, { TAB_PATHS } from "./hooks/useTabSwipe.js";
 import BottomNav from "./components/layout/BottomNav.jsx";
 import TopBar from "./components/layout/TopBar.jsx";
 import ScrollToTopButton from "./components/ui/ScrollToTopButton.jsx";
@@ -29,6 +30,28 @@ import { LANGUAGES } from "./i18n";
 
 export default function App() {
   const { i18n } = useTranslation();
+  const location = useLocation();
+  const swipe = useTabSwipe();
+
+  // Pick a slide direction for the page transition by comparing the tab we're
+  // entering with the one we just left. Mirrored for RTL so the motion always
+  // matches the swipe. Falls back to a plain fade on non-tab routes. Computed by
+  // adjusting state during render (React's pattern for "value from last render")
+  // so the class is ready before paint — no ref-during-render anti-pattern.
+  const [prevPath, setPrevPath] = useState(location.pathname);
+  const [pageAnim, setPageAnim] = useState("page-enter");
+  if (location.pathname !== prevPath) {
+    const idx = TAB_PATHS.indexOf(location.pathname);
+    const oldIdx = TAB_PATHS.indexOf(prevPath);
+    const rtl = i18n.dir() === "rtl";
+    let next = "page-enter";
+    if (idx !== -1 && oldIdx !== -1 && idx !== oldIdx) {
+      const forward = idx > oldIdx;
+      next = `page-enter-from-${forward === rtl ? "left" : "right"}`;
+    }
+    setPrevPath(location.pathname);
+    setPageAnim(next);
+  }
 
   // On boot: validate any stored token, then load the live tournament data.
   useEffect(() => {
@@ -56,9 +79,12 @@ export default function App() {
 
       <TopBar />
 
-      {/* Page content. Bottom padding leaves room for the floating navbar. */}
-      <main className="mx-auto max-w-2xl px-4 pb-28 pt-5">
-        <Routes>
+      {/* Page content. Bottom padding leaves room for the floating navbar.
+          Swipe handlers let you flick left/right between the main tabs; the
+          keyed wrapper replays the slide-in animation on every route change. */}
+      <main className="mx-auto max-w-2xl px-4 pb-28 pt-5" {...swipe}>
+        <div key={location.pathname} className={pageAnim}>
+        <Routes location={location}>
           <Route path="/" element={<Home />} />
           <Route path="/tournament" element={<Tournament />} />
           <Route path="/matches" element={<Matches />} />
@@ -83,6 +109,7 @@ export default function App() {
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </div>
       </main>
 
       <ScrollToTopButton />
