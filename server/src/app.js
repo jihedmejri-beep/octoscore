@@ -63,18 +63,33 @@ app.use(
 app.get("/health", (req, res) => res.json({ status: "ok", uptime: process.uptime() }));
 
 // --- Global API throttle ----------------------------------------------------
-// Coarse per-IP cap across the whole API to blunt flood/abuse (sits on top of
-// the stricter auth limiter). Generous enough for normal browsing thanks to
-// the response cache; trips only on abnormal request volume. Health check and
-// preflight (OPTIONS) are exempt so monitors and CORS aren't throttled.
-const apiLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 120, // ~2 req/sec sustained per IP
+// Two per-IP layers blunt flood/abuse while leaving real browsing comfortable
+// headroom (the response cache means a page load is only a handful of GETs).
+// OPTIONS (CORS preflight) is exempt on both so the browser is never throttled.
+const rateMsg = { message: "Too many requests — please slow down" };
+
+// Layer 1 — burst guard: a short window that instantly trips on flood scripts
+// firing dozens of requests per second, without affecting a normal page load.
+const burstLimiter = rateLimit({
+  windowMs: 10 * 1000, // 10 seconds
+  max: 40, // ~4 req/sec peak per IP
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => req.method === "OPTIONS",
-  message: { message: "Too many requests — please slow down" },
+  message: rateMsg,
 });
+
+// Layer 2 — sustained cap: limits steady abuse over a longer window.
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 90, // ~1.5 req/sec sustained per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === "OPTIONS",
+  message: rateMsg,
+});
+
+app.use("/api", burstLimiter);
 app.use("/api", apiLimiter);
 
 // --- API -------------------------------------------------------------------
