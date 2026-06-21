@@ -22,7 +22,7 @@ async function run() {
     await user.save();
     console.log(`✔  Admin updated (role + password): ${email}`);
   } else {
-    user = await User.create({
+    await User.create({
       name: ADMIN_NAME || "Tournament Admin",
       email,
       password: ADMIN_PASSWORD,

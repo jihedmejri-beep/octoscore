@@ -1,3 +1,4 @@
+import "./instrument.js"; // MUST be first — sets up Sentry before other imports
 import "dotenv/config";
 
 import app from "./app.js";

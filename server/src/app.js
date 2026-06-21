@@ -5,6 +5,7 @@ import compression from "compression";
 import morgan from "morgan";
 import mongoSanitize from "express-mongo-sanitize";
 import rateLimit from "express-rate-limit";
+import * as Sentry from "@sentry/node";
 
 import apiRoutes from "./routes/index.js";
 import { cache, invalidateOnWrite } from "./middleware/cache.js";
@@ -102,6 +103,11 @@ app.use("/api", apiRoutes);
 
 // --- Fallbacks -------------------------------------------------------------
 app.use(notFound);
+
+// Report unhandled route errors to Sentry (no-op until SENTRY_DSN is set) before
+// our own handler turns them into a JSON response. Must come after the routes.
+if (process.env.SENTRY_DSN) Sentry.setupExpressErrorHandler(app);
+
 app.use(errorHandler);
 
 export default app;

@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "check": "eslint . && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@sentry/react": "^10.59.0",
     "axios": "^1.17.0",
     "i18next": "^26.3.1",
     "react": "^19.2.6",

@@ -45,7 +45,7 @@ async function seedAdmin() {
     await user.save();
     console.log(`✔  Admin already exists, role ensured: ${email}`);
   } else {
-    user = await User.create({
+    await User.create({
       name: ADMIN_NAME || "Tournament Admin",
       email,
       password: ADMIN_PASSWORD,

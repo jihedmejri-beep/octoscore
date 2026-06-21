@@ -1,5 +1,7 @@
 import { Component } from "react";
 
+import { captureError } from "../sentry.js";
+
 // TEMP debug aid: catches React render errors and shows them on screen instead
 // of a blank page. Safe to remove once the app is stable.
 export default class ErrorBoundary extends Component {
@@ -14,6 +16,7 @@ export default class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     console.error("Render error:", error, info);
+    captureError(error, { componentStack: info?.componentStack });
   }
 
   render() {
