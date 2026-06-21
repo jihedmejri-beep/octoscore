@@ -232,6 +232,9 @@
     border-radius: 9999px;
     background: var(--q-white);
     animation: quiz-twinkle ease-in-out infinite;
+    /* Promote to its own GPU layer so the twinkle composites cheaply and
+       doesn't repeatedly invalidate the backdrop-blurred card above it. */
+    will-change: transform, opacity;
   }
 
   /* 6. Scanlines overlay — a faint CRT texture. */
@@ -284,6 +287,23 @@
     background: rgba(124, 58, 237, 0.22);
     border-color: var(--q-p3);
     box-shadow: 0 0 22px -4px rgba(192, 132, 252, 0.7);
+  }
+  /* Shrinking bar that visualises the auto-advance countdown. Uses transform
+     (GPU-cheap) and runs once; duration is set inline to AUTO_ADVANCE_MS. */
+  .quiz-countdown-bar {
+    transform-origin: left center;
+    animation-name: quiz-countdown;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+  }
+}
+
+@keyframes quiz-countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
   }
 }
 

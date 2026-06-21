@@ -5,7 +5,7 @@
 // under `.quiz-arena` / `.quiz-*`. Purely decorative, so it is aria-hidden and
 // never captures pointer events.
 
-const STAR_COUNT = 60;
+const STAR_COUNT = 32;
 
 // Generated once at module load — a fixed starfield is plenty for decoration,
 // and keeping the randomness out of render keeps the component pure.

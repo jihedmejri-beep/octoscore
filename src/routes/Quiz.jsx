@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import Loader from "../components/ui/Loader.jsx";
@@ -34,6 +34,14 @@ const TrophyIcon = () => (
 
 const LETTERS = ["A", "B", "C", "D"];
 const DIFFICULTY_COLOR = { easy: "#39FF14", medium: "#FFC700", hard: "#FF5C5C" };
+const AUTO_ADVANCE_MS = 1400; // pause to read the result before moving on
+
+// Small spinner shown on the chosen option while the server checks the answer.
+const Spinner = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5 animate-spin" {...stroke}>
+    <path d="M12 3a9 9 0 1 0 9 9" />
+  </svg>
+);
 
 // Small coloured difficulty chip shown on each question card.
 function DifficultyChip({ level }) {
@@ -53,9 +61,9 @@ function DifficultyChip({ level }) {
 // Wraps every quiz screen so the esports backdrop sits behind the content.
 // Module-level so it keeps a stable identity across re-renders — otherwise the
 // star field would remount (and reset) on every answer.
-function Arena({ children }) {
+function Arena({ children, onClick }) {
   return (
-    <div className="quiz-arena relative">
+    <div className="quiz-arena relative" onClick={onClick}>
       <QuizBackground />
       <div className="relative z-10 space-y-7">{children}</div>
     </div>
@@ -150,6 +158,28 @@ export default function Quiz() {
     };
   }, []);
 
+  // Advance to the next question, or finish on the last one. Stable identity so
+  // both the auto-advance timer and tap-to-skip share one code path.
+  const finishOrNext = useCallback((curStep, qs) => {
+    if (!qs) return;
+    if (curStep + 1 >= qs.length) {
+      setFinished(true);
+    } else {
+      setStep(curStep + 1);
+      setSelected(null);
+      setAnswered(false);
+      setReveal(null);
+    }
+  }, []);
+
+  // Once an answer is revealed, auto-advance after a short pause. Tapping to skip
+  // changes state, which re-runs this effect and clears the pending timer.
+  useEffect(() => {
+    if (!answered || !questions) return undefined;
+    const id = setTimeout(() => finishOrNext(step, questions), AUTO_ADVANCE_MS);
+    return () => clearTimeout(id);
+  }, [answered, step, questions, finishOrNext]);
+
   const restart = () => {
     setStep(0);
     setSelected(null);
@@ -207,19 +237,12 @@ export default function Quiz() {
       .catch(() => setPending(false));
   };
 
-  const next = () => {
-    if (step + 1 >= total) {
-      setFinished(true);
-      return;
-    }
-    setStep((s) => s + 1);
-    setSelected(null);
-    setAnswered(false);
-    setReveal(null);
-  };
+  const isLast = step + 1 >= total;
+  const skip = () => answered && finishOrNext(step, questions);
 
   return (
-    <Arena>
+    // When an answer is revealed, tapping anywhere on the arena skips the wait.
+    <Arena onClick={skip}>
       <ArenaHeading />
 
       {/* Progress: counter + bar */}
@@ -256,9 +279,12 @@ export default function Quiz() {
         {q.options.map((opt, i) => {
           const isCorrect = opt.id === reveal;
           const isSelected = opt.id === selected;
+          const loading = pending && isSelected;
 
           let cls = "quiz-option hover:-translate-y-0.5 hover:border-[rgba(192,132,252,0.6)]";
-          if (answered) {
+          if (loading) {
+            cls = "quiz-option border-[var(--q-p3)] bg-[rgba(124,58,237,0.28)]";
+          } else if (answered) {
             if (isCorrect) cls = "quiz-option quiz-option-correct";
             else if (isSelected) cls = "border border-red-500 bg-red-500/10";
             else cls = "quiz-option opacity-40";
@@ -268,19 +294,19 @@ export default function Quiz() {
             <button
               key={opt.id}
               onClick={() => choose(opt.id)}
-              disabled={answered || pending}
+              disabled={pending}
               className={`flex w-full items-center gap-4 rounded-2xl px-4 py-4 text-start transition-all duration-300 active:scale-[0.99] ${cls}`}
             >
               <span
                 className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl font-mono text-sm font-bold ${
-                  answered && isCorrect
+                  (answered && isCorrect) || loading
                     ? "bg-[var(--q-p3)] text-black"
                     : answered && isSelected
                     ? "bg-red-500 text-white"
                     : "bg-white/10 text-[var(--q-p3)]"
                 }`}
               >
-                {LETTERS[i]}
+                {loading ? <Spinner /> : LETTERS[i]}
               </span>
               <span className="flex-1 font-sans text-base font-medium text-white">{opt.label}</span>
               {answered && isCorrect && (
@@ -298,13 +324,26 @@ export default function Quiz() {
         })}
       </div>
 
-      {/* Next / Finish */}
+      {/* Next / Finish — auto-fires after AUTO_ADVANCE_MS; the bar shows the
+          countdown and tapping it (or anywhere) skips the wait immediately. */}
       {answered && (
         <button
-          onClick={next}
-          className="rise w-full rounded-2xl bg-[var(--q-p1)] py-4 font-display text-sm font-bold uppercase tracking-wide text-white shadow-[0_0_30px_-6px_rgba(147,51,234,0.9)] transition-opacity hover:opacity-90"
+          onClick={(e) => {
+            e.stopPropagation();
+            skip();
+          }}
+          className="rise w-full overflow-hidden rounded-2xl bg-[var(--q-p1)] shadow-[0_0_30px_-6px_rgba(147,51,234,0.9)] transition-opacity hover:opacity-90"
         >
-          {step + 1 >= total ? t("quiz.finish") : t("quiz.next")}
+          <span className="flex items-center justify-center gap-2 py-4 font-display text-sm font-bold uppercase tracking-wide text-white">
+            {isLast ? t("quiz.finish") : t("quiz.next")}
+            <span className="font-mono text-[11px] normal-case opacity-60">· tap or wait</span>
+          </span>
+          <span className="block h-1 w-full bg-black/25">
+            <span
+              className="quiz-countdown-bar block h-full bg-white/80"
+              style={{ animationDuration: `${AUTO_ADVANCE_MS}ms` }}
+            />
+          </span>
         </button>
       )}
     </Arena>
