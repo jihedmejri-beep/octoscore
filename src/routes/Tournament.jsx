@@ -1,9 +1,11 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import TeamCrest from "../components/ui/TeamCrest.jsx";
 import Loader from "../components/ui/Loader.jsx";
 import { useDataStore } from "../store/dataStore";
+import { buildBracket } from "../lib/bracket.js";
 
 // --- Decorative octopus mark (line-art, on-theme) --------------------------
 function Octopus({ className = "h-10 w-10" }) {
@@ -129,6 +131,10 @@ function GroupPath({ groupId, data, delay }) {
   const group = useDataStore((s) => s.groups.find((g) => g.id === groupId));
   if (!data) return null;
 
+  const hasQf = data.qf?.length > 0;
+  const hasSf = data.sf?.length > 0;
+  const hasFinal = Boolean(data.final);
+
   return (
     <section className="rise" style={{ "--d": `${delay}ms` }}>
       <div className="mb-4 flex items-center gap-3">
@@ -144,29 +150,41 @@ function GroupPath({ groupId, data, delay }) {
       </div>
 
       <div className="rounded-3xl border border-white/[0.05] bg-white/[0.015] p-3">
-        <RoundLabel>{t("tournament.quarterfinals")}</RoundLabel>
-        <div className="grid grid-cols-2 gap-2.5">
-          {data.qf.map((m) => (
-            <BracketMatch key={m.id} match={m} label="QF" />
-          ))}
-        </div>
+        {hasQf && (
+          <>
+            <RoundLabel>{t("tournament.quarterfinals")}</RoundLabel>
+            <div className="grid grid-cols-2 gap-2.5">
+              {data.qf.map((m) => (
+                <BracketMatch key={m.id} match={m} label="QF" />
+              ))}
+            </div>
+          </>
+        )}
 
-        <Connector />
+        {hasQf && hasSf && <Connector />}
 
-        <RoundLabel>{t("tournament.semifinals")}</RoundLabel>
-        <div className="grid grid-cols-2 gap-2.5">
-          {data.sf.map((m) => (
-            <BracketMatch key={m.id} match={m} label="SF" />
-          ))}
-        </div>
+        {hasSf && (
+          <>
+            <RoundLabel>{t("tournament.semifinals")}</RoundLabel>
+            <div className="grid grid-cols-2 gap-2.5">
+              {data.sf.map((m) => (
+                <BracketMatch key={m.id} match={m} label="SF" />
+              ))}
+            </div>
+          </>
+        )}
 
-        <Connector />
+        {(hasQf || hasSf) && hasFinal && <Connector />}
 
-        <RoundLabel>{t("tournament.groupFinal")}</RoundLabel>
-        <div className="mx-auto max-w-[260px]">
-          <BracketMatch match={data.final} label={t("tournament.final")} />
-          <GroupWinnerBadge teamId={data.final.winnerId} />
-        </div>
+        {hasFinal && (
+          <>
+            <RoundLabel>{t("tournament.groupFinal")}</RoundLabel>
+            <div className="mx-auto max-w-[260px]">
+              <BracketMatch match={data.final} label={t("tournament.final")} />
+              {data.final.winnerId && <GroupWinnerBadge teamId={data.final.winnerId} />}
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
@@ -175,9 +193,15 @@ function GroupPath({ groupId, data, delay }) {
 // --- Page -------------------------------------------------------------------
 export default function Tournament() {
   const { t, i18n } = useTranslation();
-  const bracket = useDataStore((s) => s.bracket);
+  const matches = useDataStore((s) => s.matches);
+  const groups = useDataStore((s) => s.groups);
   const teams = useDataStore((s) => s.teams);
   const loaded = useDataStore((s) => s.loaded);
+
+  // The bracket is derived from the matches the admin enters — no separate
+  // hand-maintained bracket document.
+  const bracket = useMemo(() => buildBracket(matches, groups), [matches, groups]);
+  const isEmpty = Object.keys(bracket).length === 0;
 
   const nameOf = (id) => teams.find((tm) => tm.id === id)?.name;
 
@@ -198,7 +222,7 @@ export default function Tournament() {
 
       {!loaded ? (
         <Loader />
-      ) : !bracket ? (
+      ) : isEmpty ? (
         <div className="octo-card p-8 text-center font-mono text-xs uppercase tracking-widest text-gray-500">
           {t("matches.noMatches")}
         </div>
@@ -248,12 +272,14 @@ export default function Tournament() {
                   </div>
                 )}
 
-                <Link
-                  to="/matches/m8"
-                  className="block rounded-2xl bg-octo-purple py-3 font-display text-sm font-bold uppercase tracking-wide text-white shadow-glow-purple transition-opacity hover:opacity-90"
-                >
-                  {t("tournament.viewFinal")}
-                </Link>
+                {bracket.grandFinal.id && (
+                  <Link
+                    to={`/matches/${bracket.grandFinal.id}`}
+                    className="block rounded-2xl bg-octo-purple py-3 font-display text-sm font-bold uppercase tracking-wide text-white shadow-glow-purple transition-opacity hover:opacity-90"
+                  >
+                    {t("tournament.viewFinal")}
+                  </Link>
+                )}
               </div>
             </section>
           )}
