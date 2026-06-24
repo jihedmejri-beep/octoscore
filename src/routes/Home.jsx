@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import Hero from "../components/home/Hero.jsx";
 import TeamCrest from "../components/ui/TeamCrest.jsx";
 import Loader from "../components/ui/Loader.jsx";
+import Footer from "../components/layout/Footer.jsx";
 import { useDataStore } from "../store/dataStore";
 
 // --- Small presentational helpers -----------------------------------------
@@ -254,6 +255,11 @@ export default function Home() {
               </span>
               <span className="text-octo-purple transition-transform group-hover:translate-x-1">→</span>
             </button>
+          </section>
+
+          {/* Dedication / credits — Home page only */}
+          <section className="rise" style={{ "--d": "480ms" }}>
+            <Footer />
           </section>
         </>
       )}
