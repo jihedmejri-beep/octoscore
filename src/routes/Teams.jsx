@@ -7,14 +7,23 @@ import TeamCrest from "../components/ui/TeamCrest.jsx";
 import Loader from "../components/ui/Loader.jsx";
 import { useDataStore } from "../store/dataStore";
 
+// Accent palette cycled by the group's position, so any set of groups gets a
+// distinct color (no longer assumes there are exactly two groups, A and B).
+const GROUP_BADGE = [
+  "bg-octo-purple/15 text-octo-purple",
+  "bg-octo-cyan/15 text-octo-cyan",
+  "bg-octo-gold/15 text-octo-gold",
+  "bg-octo-green/15 text-octo-green",
+];
+
 function GroupBadge({ group }) {
-  const name = useDataStore((s) => s.groups.find((g) => g.id === group)?.name) ?? group;
-  const isA = group === "A";
+  const groups = useDataStore((s) => s.groups);
+  const idx = groups.findIndex((g) => g.id === group);
+  const name = groups[idx]?.name ?? group;
+  const cls = GROUP_BADGE[(idx < 0 ? 0 : idx) % GROUP_BADGE.length];
   return (
     <span
-      className={`rounded-full px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider ${
-        isA ? "bg-octo-purple/15 text-octo-purple" : "bg-octo-cyan/15 text-octo-cyan"
-      }`}
+      className={`rounded-full px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider ${cls}`}
     >
       {name}
     </span>
@@ -38,8 +47,6 @@ function TeamCard({ team }) {
   );
 }
 
-const FILTERS = ["ALL", "A", "B"];
-
 export default function Teams() {
   const { t } = useTranslation();
   const [group, setGroup] = useState("ALL");
@@ -47,6 +54,10 @@ export default function Teams() {
   const allTeams = useDataStore((s) => s.teams);
   const groups = useDataStore((s) => s.groups);
   const loaded = useDataStore((s) => s.loaded);
+
+  // Build the filter row from the real groups so a team always has a matching
+  // filter (sorted by the group's display order).
+  const FILTERS = ["ALL", ...[...groups].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map((g) => g.id)];
 
   const teams = allTeams.filter((tm) => group === "ALL" || tm.group === group);
   const filterLabel = (g) =>

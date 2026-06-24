@@ -204,8 +204,11 @@ export default function Tournament() {
         </div>
       ) : (
         <>
-          <GroupPath groupId="A" data={bracket.A} delay={80} />
-          <GroupPath groupId="B" data={bracket.B} delay={160} />
+          {Object.keys(bracket)
+            .filter((k) => k !== "grandFinal")
+            .map((groupId, i) => (
+              <GroupPath key={groupId} groupId={groupId} data={bracket[groupId]} delay={80 + i * 80} />
+            ))}
 
           {/* Grand Final */}
           {bracket.grandFinal && (

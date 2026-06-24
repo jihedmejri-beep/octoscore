@@ -78,11 +78,13 @@ async function run() {
   await upsertAll(Quiz, QUIZ);
 
   console.log("→ Seeding content (bracket + rules)…");
-  await Content.findByIdAndUpdate(
-    "bracket",
-    { data: BRACKET },
-    { upsert: true, setDefaultsOnInsert: true }
-  );
+  if (BRACKET) {
+    await Content.findByIdAndUpdate(
+      "bracket",
+      { data: BRACKET },
+      { upsert: true, setDefaultsOnInsert: true }
+    );
+  }
   await Content.findByIdAndUpdate(
     "rules",
     { data: RULES },
