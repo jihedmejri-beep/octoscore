@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { GALLERY } from "../../data/mockData";
 import { fetchGallery, galleryDownloadUrl } from "../../services/galleryService.js";
 
 const ACCENTS = {
@@ -119,19 +118,19 @@ export default function Gallery() {
   const { t, i18n } = useTranslation();
   const locale = i18n.language;
 
-  // Start with the designed mock tiles, then swap in live data from the API
-  // (with uploaded photos + download links) when it's reachable.
-  const [items, setItems] = useState(GALLERY);
+  // Gallery tiles come straight from the API — admins add real photos through
+  // the admin panel. No fake/seed tiles: an empty gallery renders nothing.
+  const [items, setItems] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
 
   useEffect(() => {
     let active = true;
     fetchGallery()
       .then((data) => {
-        if (active && Array.isArray(data) && data.length) setItems(data);
+        if (active && Array.isArray(data)) setItems(data);
       })
       .catch(() => {
-        /* API offline — keep the mock tiles */
+        /* API offline — leave the gallery empty */
       });
     return () => {
       active = false;
@@ -165,6 +164,9 @@ export default function Gallery() {
 
   const current = isOpen ? items[openIndex] : null;
   const canDownload = Boolean(current?.image?.url);
+
+  // Nothing to show until the admin uploads real photos — hide the section.
+  if (items.length === 0) return null;
 
   return (
     <section>
