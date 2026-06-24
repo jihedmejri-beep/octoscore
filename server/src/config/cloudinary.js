@@ -36,6 +36,22 @@ export function destroyAsset(publicId) {
   return cloudinary.uploader.destroy(publicId);
 }
 
+// Optimized delivery URL: f_auto (best format for the browser) + q_auto
+// (smart compression) + an optional width cap (c_limit never upscales). This
+// is what makes galleries fast — thumbnails are a fraction of the original.
+export function deliveryUrl(publicId, { width, height } = {}) {
+  if (!publicId) return null;
+  return cloudinary.url(publicId, {
+    secure: true,
+    resource_type: "image",
+    fetch_format: "auto",
+    quality: "auto",
+    crop: "limit",
+    ...(width ? { width } : {}),
+    ...(height ? { height } : {}),
+  });
+}
+
 // Build a "force download" URL (Cloudinary fl_attachment) so the gallery's
 // download button saves the original file instead of opening it inline.
 export function attachmentUrl(publicId, filename) {

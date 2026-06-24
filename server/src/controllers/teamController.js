@@ -1,5 +1,6 @@
 import Team from "../models/Team.js";
 import Player from "../models/Player.js";
+import TeamPhoto from "../models/TeamPhoto.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import { uploadBuffer, destroyAsset, cloudinaryReady } from "../config/cloudinary.js";
@@ -70,5 +71,11 @@ export const deleteTeam = asyncHandler(async (req, res) => {
   if (!team) throw new ApiError(404, "Team not found");
   if (team.logo?.publicId) await destroyAsset(team.logo.publicId);
   await Player.deleteMany({ teamId: team.id });
+
+  // Remove the album's photos and their Cloudinary assets.
+  const photos = await TeamPhoto.find({ teamId: team.id });
+  await Promise.all(photos.map((p) => destroyAsset(p.image?.publicId)));
+  await TeamPhoto.deleteMany({ teamId: team.id });
+
   res.json({ message: "Team and its players deleted" });
 });

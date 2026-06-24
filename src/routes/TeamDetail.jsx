@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import TeamCrest from "../components/ui/TeamCrest.jsx";
 import Pitch from "../components/team/Pitch.jsx";
 import PlayerModal from "../components/team/PlayerModal.jsx";
+import TeamAlbum from "../components/team/TeamAlbum.jsx";
 import Loader from "../components/ui/Loader.jsx";
 import { ArrowLeft, Instagram, Facebook } from "../components/ui/icons.jsx";
 import { fetchTeam } from "../services/teamService";
@@ -154,6 +155,9 @@ export default function TeamDetail() {
           </div>
         </section>
       )}
+
+      {/* Photo album */}
+      <TeamAlbum teamId={teamId} />
 
       <PlayerModal player={player} teamId={teamId} onClose={() => setPlayer(null)} />
     </div>

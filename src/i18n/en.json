@@ -171,7 +171,8 @@
     "lineup": "Starting Lineup",
     "squad": "Squad",
     "coach": "Coach",
-    "headCoach": "Head Coach"
+    "headCoach": "Head Coach",
+    "album": "Album"
   },
   "player": {
     "number": "Number",

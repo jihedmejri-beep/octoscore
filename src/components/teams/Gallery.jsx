@@ -37,7 +37,9 @@ function DownloadIcon() {
 // uploaded one; otherwise a designed accent tile stands in for it.
 function MemoryFace({ item, index, locale, big = false }) {
   const accent = ACCENTS[item.accent] ?? ACCENTS.purple;
-  const photo = item.image?.url;
+  // Small optimized thumbnail in the grid, medium one in the lightbox; fall
+  // back to the raw URL for older items served before the optimization.
+  const photo = (big ? item.fullUrl : item.thumbUrl) || item.image?.url;
   return (
     <div
       className="relative h-full w-full overflow-hidden"

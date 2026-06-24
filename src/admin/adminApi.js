@@ -7,6 +7,13 @@ export const updateTeam = (id, formData) =>
   api.put(`/teams/${id}`, formData).then((r) => r.data);
 export const deleteTeam = (id) => api.delete(`/teams/${id}`).then((r) => r.data);
 
+// Team photo album (multipart: one or more "photos" files)
+export const listTeamPhotos = (id) => api.get(`/teams/${id}/photos`).then((r) => r.data);
+export const uploadTeamPhotos = (id, formData) =>
+  api.post(`/teams/${id}/photos`, formData).then((r) => r.data);
+export const deleteTeamPhoto = (teamId, photoId) =>
+  api.delete(`/teams/${teamId}/photos/${photoId}`).then((r) => r.data);
+
 // --- Players ---------------------------------------------------------------
 export const listPlayers = (teamId) =>
   api.get("/players", { params: teamId ? { teamId } : {} }).then((r) => r.data);

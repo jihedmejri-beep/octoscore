@@ -5,15 +5,18 @@ import {
   uploadBuffer,
   destroyAsset,
   attachmentUrl,
+  deliveryUrl,
   cloudinaryReady,
 } from "../config/cloudinary.js";
 
-// Attach a ready-to-use forced-download URL to each item.
+// Attach optimized thumbnail/full URLs plus a forced-download URL, so the grid
+// loads small images and only the original is fetched on download.
 const serialize = (doc) => {
   const obj = doc.toJSON();
-  obj.downloadUrl = obj.image?.publicId
-    ? attachmentUrl(obj.image.publicId, obj.title)
-    : obj.image?.url || null;
+  const pid = obj.image?.publicId;
+  obj.thumbUrl = pid ? deliveryUrl(pid, { width: 500 }) : obj.image?.url || null;
+  obj.fullUrl = pid ? deliveryUrl(pid, { width: 1400 }) : obj.image?.url || null;
+  obj.downloadUrl = pid ? attachmentUrl(pid, obj.title) : obj.image?.url || null;
   return obj;
 };
 

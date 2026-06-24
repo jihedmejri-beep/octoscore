@@ -10,7 +10,16 @@ import {
   Pill,
 } from "../components/AdminTable.jsx";
 import { AdminModal, useForm, TextField, SelectField } from "../components/AdminForm.jsx";
-import { listTeams, createTeam, updateTeam, deleteTeam, listGroups } from "../adminApi.js";
+import {
+  listTeams,
+  createTeam,
+  updateTeam,
+  deleteTeam,
+  listGroups,
+  listTeamPhotos,
+  uploadTeamPhotos,
+  deleteTeamPhoto,
+} from "../adminApi.js";
 
 const GROUP_COLORS = { A: "#6236FF", B: "#00E5FF", FINAL: "#FFC700" };
 
@@ -24,6 +33,11 @@ export default function ManageTeams() {
   const [formError, setFormError] = useState("");
   const [confirm, setConfirm] = useState(null);
   const [logo, setLogo] = useState(null);
+
+  // Album state for the team being edited.
+  const [photos, setPhotos] = useState([]);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoError, setPhotoError] = useState("");
 
   const form = useForm({ name: "", group: "", city: "", color: "" });
 
@@ -45,6 +59,8 @@ export default function ManageTeams() {
   const openCreate = () => {
     setEditing(null);
     setLogo(null);
+    setPhotos([]);
+    setPhotoError("");
     form.setValues({ name: "", group: groups[0]?.id || "", city: "", color: "" });
     setFormError("");
     setModal(true);
@@ -52,9 +68,43 @@ export default function ManageTeams() {
   const openEdit = (team) => {
     setEditing(team);
     setLogo(null);
+    setPhotoError("");
     form.setValues({ name: team.name, group: team.group, city: team.city || "", color: team.color || "" });
     setFormError("");
     setModal(true);
+    // Load the team's album.
+    setPhotos([]);
+    listTeamPhotos(team.id).then(setPhotos).catch(() => setPhotos([]));
+  };
+
+  // Upload one or more album photos immediately (independent of the team form).
+  const addPhotos = async (files) => {
+    if (!editing || !files?.length) return;
+    setPhotoBusy(true);
+    setPhotoError("");
+    try {
+      const fd = new FormData();
+      [...files].forEach((f) => fd.append("photos", f));
+      const created = await uploadTeamPhotos(editing.id, fd);
+      setPhotos((prev) => [...prev, ...created]);
+    } catch (err) {
+      setPhotoError(err.message);
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+
+  const removePhoto = async (photoId) => {
+    setPhotoBusy(true);
+    setPhotoError("");
+    try {
+      await deleteTeamPhoto(editing.id, photoId);
+      setPhotos((prev) => prev.filter((p) => p.id !== photoId));
+    } catch (err) {
+      setPhotoError(err.message);
+    } finally {
+      setPhotoBusy(false);
+    }
   };
 
   const submit = async (e) => {
@@ -196,6 +246,64 @@ export default function ManageTeams() {
               Square image works best. Uploads to Cloudinary (server keys required).
             </p>
           </div>
+
+          {/* Photo album — only after the team exists (needs its id). */}
+          {editing ? (
+            <div className="border-t border-white/5 pt-4">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                  Album ({photos.length})
+                </span>
+                <label className="cursor-pointer rounded-full bg-octo-purple px-4 py-1.5 font-display text-[11px] font-bold uppercase tracking-wide text-white transition-opacity hover:opacity-90">
+                  {photoBusy ? "Uploading…" : "+ Add photos"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    disabled={photoBusy}
+                    onChange={(e) => {
+                      addPhotos(e.target.files);
+                      e.target.value = "";
+                    }}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              {photoError && (
+                <p className="mb-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 font-mono text-[11px] text-red-300">
+                  {photoError}
+                </p>
+              )}
+
+              {photos.length === 0 ? (
+                <p className="font-mono text-[10px] text-gray-500">
+                  No photos yet — add as many as you like. Fans can view and download them.
+                </p>
+              ) : (
+                <div className="grid grid-cols-4 gap-2">
+                  {photos.map((p) => (
+                    <div key={p.id} className="group relative aspect-square overflow-hidden rounded-xl border border-white/10 bg-octo-elevated">
+                      <img src={p.thumbUrl} alt="" className="h-full w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(p.id)}
+                        disabled={photoBusy}
+                        aria-label="Delete photo"
+                        className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-black/70 text-white opacity-0 transition-opacity hover:bg-red-500/80 group-hover:opacity-100 disabled:opacity-40"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="border-t border-white/5 pt-4 font-mono text-[10px] text-gray-500">
+              Create the team first, then edit it to add a photo album.
+            </p>
+          )}
         </AdminModal>
       )}
 

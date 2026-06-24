@@ -171,7 +171,8 @@
     "lineup": "Composition",
     "squad": "Effectif",
     "coach": "Entraîneur",
-    "headCoach": "Entraîneur Principal"
+    "headCoach": "Entraîneur Principal",
+    "album": "Album"
   },
   "player": {
     "number": "Numéro",
