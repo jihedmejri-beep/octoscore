@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
 import { fetchGallery, galleryDownloadUrl } from "../../services/galleryService.js";
@@ -207,8 +208,9 @@ export default function Gallery() {
         ))}
       </div>
 
-      {/* Lightbox */}
-      {isOpen && current && (
+      {/* Lightbox — portaled to <body> so it escapes the transformed page
+          wrapper (the swipe/slide animation) and centers on the viewport. */}
+      {isOpen && current && createPortal(
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center p-4"
           role="dialog"
@@ -289,7 +291,8 @@ export default function Gallery() {
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           </button>
-        </div>
+        </div>,
+        document.body,
       )}
     </section>
   );

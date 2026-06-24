@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
 import { fetchTeamPhotos } from "../../services/teamService";
@@ -91,7 +92,9 @@ export default function TeamAlbum({ teamId }) {
         ))}
       </div>
 
-      {isOpen && current && (
+      {/* Lightbox — portaled to <body> so it escapes the transformed page
+          wrapper (the swipe/slide animation) and centers on the viewport. */}
+      {isOpen && current && createPortal(
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true">
           <button
             type="button"
@@ -154,7 +157,8 @@ export default function TeamAlbum({ teamId }) {
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           </button>
-        </div>
+        </div>,
+        document.body,
       )}
     </section>
   );
