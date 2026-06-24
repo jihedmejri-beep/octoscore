@@ -193,5 +193,12 @@
     "easy": "Facile",
     "medium": "Moyen",
     "hard": "Difficile"
+  },
+  "footer": {
+    "createdBy": "Créé par",
+    "testedBy": "Testé par",
+    "certifiedBy": "Certifié par",
+    "madeWith": "Conçu avec passion pour le tournoi",
+    "rights": "Tous droits réservés"
   }
 }

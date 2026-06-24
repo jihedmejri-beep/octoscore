@@ -193,5 +193,12 @@
     "easy": "Easy",
     "medium": "Medium",
     "hard": "Hard"
+  },
+  "footer": {
+    "createdBy": "Created by",
+    "testedBy": "Tested by",
+    "certifiedBy": "Certified by",
+    "madeWith": "Built with passion for the tournament",
+    "rights": "All rights reserved"
   }
 }

@@ -193,5 +193,12 @@
     "easy": "سهل",
     "medium": "متوسط",
     "hard": "صعب"
+  },
+  "footer": {
+    "createdBy": "إنشاء",
+    "testedBy": "اختبار",
+    "certifiedBy": "اعتماد",
+    "madeWith": "صُنع بشغف من أجل البطولة",
+    "rights": "جميع الحقوق محفوظة"
   }
 }
