@@ -2,13 +2,12 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../../hooks/useAuth.js";
-import { listTeams, listMatches, listGallery, listQuizAdmin, listGroups } from "../adminApi.js";
+import { listTeams, listMatches, listQuizAdmin, listGroups } from "../adminApi.js";
 import { Spinner, ErrorNote } from "../components/AdminTable.jsx";
 
 const CARDS = [
   { key: "teams", label: "Teams", to: "/admin/teams", color: "#6236FF" },
   { key: "matches", label: "Matches", to: "/admin/matches", color: "#00E5FF" },
-  { key: "gallery", label: "Memories", to: "/admin/gallery", color: "#FFC700" },
   { key: "quiz", label: "Questions", to: "/admin/quiz", color: "#39FF14" },
   { key: "groups", label: "Groups", to: "/admin/groups", color: "#FF5CAA" },
 ];
@@ -19,12 +18,11 @@ export default function Dashboard() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    Promise.all([listTeams(), listMatches(), listGallery(), listQuizAdmin(), listGroups()])
-      .then(([teams, matches, gallery, quiz, groups]) =>
+    Promise.all([listTeams(), listMatches(), listQuizAdmin(), listGroups()])
+      .then(([teams, matches, quiz, groups]) =>
         setCounts({
           teams: teams.length,
           matches: matches.length,
-          gallery: gallery.length,
           quiz: quiz.length,
           groups: groups.length,
         })

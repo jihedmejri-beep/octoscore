@@ -10,7 +10,6 @@ const TABS = [
   { to: "/admin/teams", label: "Teams" },
   { to: "/admin/players", label: "Players" },
   { to: "/admin/matches", label: "Matches" },
-  { to: "/admin/gallery", label: "Gallery" },
   { to: "/admin/quiz", label: "Quiz" },
   { to: "/admin/groups", label: "Groups" },
   { to: "/admin/content", label: "Content" },

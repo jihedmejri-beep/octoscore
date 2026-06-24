@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import Gallery from "../components/teams/Gallery.jsx";
 import TeamCrest from "../components/ui/TeamCrest.jsx";
 import Loader from "../components/ui/Loader.jsx";
 import { useDataStore } from "../store/dataStore";
@@ -64,7 +63,7 @@ export default function Teams() {
     g === "ALL" ? t("teams.all") : groups.find((x) => x.id === g)?.name ?? g;
 
   return (
-    <div className="space-y-9">
+    <div>
       <section className="space-y-5">
         <h1 className="section-title flex items-center gap-2.5 text-2xl">
           <span className="h-5 w-1 rounded-full bg-octo-purple" />
@@ -105,9 +104,6 @@ export default function Teams() {
           </div>
         )}
       </section>
-
-      {/* Tournament memories gallery */}
-      <Gallery />
     </div>
   );
 }

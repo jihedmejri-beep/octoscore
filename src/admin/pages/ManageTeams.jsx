@@ -38,6 +38,9 @@ export default function ManageTeams() {
   const [photos, setPhotos] = useState([]);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoError, setPhotoError] = useState("");
+  // True right after a team is created, so we can prompt the user to fill the
+  // freshly-opened album instead of silently switching the modal to "Edit".
+  const [justCreated, setJustCreated] = useState(false);
 
   const form = useForm({ name: "", group: "", city: "", color: "" });
 
@@ -61,6 +64,7 @@ export default function ManageTeams() {
     setLogo(null);
     setPhotos([]);
     setPhotoError("");
+    setJustCreated(false);
     form.setValues({ name: "", group: groups[0]?.id || "", city: "", color: "" });
     setFormError("");
     setModal(true);
@@ -69,6 +73,7 @@ export default function ManageTeams() {
     setEditing(team);
     setLogo(null);
     setPhotoError("");
+    setJustCreated(false);
     form.setValues({ name: team.name, group: team.group, city: team.city || "", color: team.color || "" });
     setFormError("");
     setModal(true);
@@ -125,10 +130,22 @@ export default function ManageTeams() {
       fd.append("color", v.color);
       if (logo) fd.append("logo", logo);
 
-      if (editing) await updateTeam(editing.id, fd);
-      else await createTeam(fd);
-      setModal(false);
-      load();
+      if (editing) {
+        await updateTeam(editing.id, fd);
+        setModal(false);
+        load();
+      } else {
+        // Creating: the new team comes with its own (empty) album. Stay in the
+        // modal and switch to edit mode so that album opens immediately for the
+        // user to upload this team's photos.
+        const created = await createTeam(fd);
+        setEditing(created);
+        setLogo(null);
+        setPhotos([]);
+        setPhotoError("");
+        setJustCreated(true);
+        load();
+      }
     } catch (err) {
       setFormError(err.message);
     } finally {
@@ -250,9 +267,15 @@ export default function ManageTeams() {
           {/* Photo album — only after the team exists (needs its id). */}
           {editing ? (
             <div className="border-t border-white/5 pt-4">
+              {justCreated && (
+                <p className="mb-3 rounded-xl border border-octo-green/30 bg-octo-green/10 px-3 py-2 font-mono text-[11px] text-octo-green">
+                  Team created. Its album is ready below — add this team's photos
+                  now, or close when you're done.
+                </p>
+              )}
               <div className="mb-2 flex items-center justify-between">
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-gray-400">
-                  Album ({photos.length})
+                <span className="truncate font-mono text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                  {editing.name} album ({photos.length})
                 </span>
                 <label className="cursor-pointer rounded-full bg-octo-purple px-4 py-1.5 font-display text-[11px] font-bold uppercase tracking-wide text-white transition-opacity hover:opacity-90">
                   {photoBusy ? "Uploading…" : "+ Add photos"}

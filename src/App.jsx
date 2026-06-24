@@ -20,7 +20,6 @@ import Dashboard from "./admin/pages/Dashboard.jsx";
 import ManageTeams from "./admin/pages/ManageTeams.jsx";
 import ManagePlayers from "./admin/pages/ManagePlayers.jsx";
 import ManageMatches from "./admin/pages/ManageMatches.jsx";
-import ManageGallery from "./admin/pages/ManageGallery.jsx";
 import ManageQuiz from "./admin/pages/ManageQuiz.jsx";
 import ManageGroups from "./admin/pages/ManageGroups.jsx";
 import ManageContent from "./admin/pages/ManageContent.jsx";
@@ -101,7 +100,6 @@ export default function App() {
             <Route path="teams" element={<ManageTeams />} />
             <Route path="players" element={<ManagePlayers />} />
             <Route path="matches" element={<ManageMatches />} />
-            <Route path="gallery" element={<ManageGallery />} />
             <Route path="quiz" element={<ManageQuiz />} />
             <Route path="groups" element={<ManageGroups />} />
             <Route path="content" element={<ManageContent />} />

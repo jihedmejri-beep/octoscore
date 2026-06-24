@@ -27,13 +27,6 @@ export const createMatch = (body) => api.post("/matches", body).then((r) => r.da
 export const updateMatch = (id, body) => api.put(`/matches/${id}`, body).then((r) => r.data);
 export const deleteMatch = (id) => api.delete(`/matches/${id}`).then((r) => r.data);
 
-// --- Gallery (multipart) ---------------------------------------------------
-export const listGallery = () => api.get("/gallery").then((r) => r.data);
-export const createGallery = (formData) => api.post("/gallery", formData).then((r) => r.data);
-export const updateGallery = (id, formData) =>
-  api.put(`/gallery/${id}`, formData).then((r) => r.data);
-export const deleteGallery = (id) => api.delete(`/gallery/${id}`).then((r) => r.data);
-
 // --- Quiz ------------------------------------------------------------------
 export const listQuizAdmin = () => api.get("/quiz/manage").then((r) => r.data);
 export const createQuiz = (body) => api.post("/quiz", body).then((r) => r.data);
