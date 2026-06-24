@@ -116,6 +116,18 @@
   .page-enter-from-left {
     animation: page-slide-left 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
+
+  /* Floating bottom nav slides out of the way whenever a full-screen overlay
+     (photo lightbox) is open, so the image is unobstructed. The body gets
+     `overlay-open` while a lightbox is mounted. */
+  .bottom-nav {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+  }
+  body.overlay-open .bottom-nav {
+    transform: translateY(160%);
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 @keyframes page-slide-right {

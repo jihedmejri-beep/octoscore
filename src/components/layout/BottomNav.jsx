@@ -76,7 +76,7 @@ export default function BottomNav() {
     // Fixed at the bottom with 16px side margins and 12px from the bottom edge
     // (kept clear of the iOS home indicator via the safe-area inset).
     <nav
-      className="fixed inset-x-0 z-50 px-4"
+      className="bottom-nav fixed inset-x-0 z-50 px-4"
       style={{ bottom: "max(12px, env(safe-area-inset-bottom))" }}
     >
       <div
