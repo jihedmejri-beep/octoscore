@@ -30,6 +30,21 @@ const POS_OPTS = ["", "GK", "DEF", "MID", "FWD", "SUB"].map((p) => ({
 }));
 const ROLE_COLOR = { player: "#6236FF", sub: "#00E5FF", coach: "#39FF14" };
 
+// Instagram is stored as a full URL but entered as just a username. These
+// convert between the two so the admin only ever types "@handle" or "handle".
+function igHandle(value) {
+  if (!value) return "";
+  return value
+    .trim()
+    .replace(/^https?:\/\/(www\.)?instagram\.com\//i, "")
+    .replace(/[/?#].*$/, "")
+    .replace(/^@/, "");
+}
+function igUrl(value) {
+  const handle = igHandle(value);
+  return handle ? `https://instagram.com/${handle}` : "";
+}
+
 export default function ManagePlayers() {
   const [teams, setTeams] = useState([]);
   const [teamId, setTeamId] = useState("");
@@ -98,7 +113,7 @@ export default function ManagePlayers() {
       role: p.role || "player",
       pos: p.pos || "",
       isCaptain: Boolean(p.isCaptain),
-      instagram: p.instagram || "",
+      instagram: igHandle(p.instagram),
       facebook: p.facebook || "",
     });
     setFormError("");
@@ -119,7 +134,7 @@ export default function ManagePlayers() {
         pos: v.pos,
         number: v.number === "" ? null : Number(v.number),
         isCaptain: v.isCaptain,
-        instagram: v.instagram,
+        instagram: igUrl(v.instagram),
         facebook: v.facebook,
       };
       if (editing) await updatePlayer(editing.id, body);
@@ -226,7 +241,12 @@ export default function ManagePlayers() {
             </label>
           </div>
           <CheckboxField label="Team captain" {...form.bindCheck("isCaptain")} />
-          <TextField label="Instagram URL" {...form.bind("instagram")} />
+          <TextField
+            label="Instagram username"
+            placeholder="username"
+            hint="Just the handle — the full link is built automatically."
+            {...form.bind("instagram")}
+          />
           <TextField label="Facebook URL" {...form.bind("facebook")} />
         </AdminModal>
       )}
