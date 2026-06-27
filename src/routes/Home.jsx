@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import Hero from "../components/home/Hero.jsx";
@@ -140,7 +141,10 @@ function ScorerRow({ scorer, rank }) {
 
 function UpcomingCard({ match, locale, groupName }) {
   return (
-    <div className="octo-card p-4 transition duration-300 hover:-translate-y-1 hover:border-octo-purple/30">
+    <Link
+      to={`/matches/${match.id}`}
+      className="octo-card block p-4 transition duration-300 hover:-translate-y-1 hover:border-octo-purple/30"
+    >
       <div className="mb-3 flex items-center justify-between">
         <span className="label-mono">
           {groupName(match.group)} · {match.round}
@@ -153,7 +157,7 @@ function UpcomingCard({ match, locale, groupName }) {
         <TeamBadge teamId={match.awayTeamId} align="right" />
       </div>
       <div className="mt-3 truncate font-mono text-xs text-gray-500">{match.location}</div>
-    </div>
+    </Link>
   );
 }
 
@@ -205,8 +209,20 @@ export default function Home() {
             </section>
           )}
 
+          {/* Upcoming matches */}
+          {upcoming.length > 0 && (
+            <section className="rise" style={{ "--d": "240ms" }}>
+              <SectionTitle>{t("home.upcoming")}</SectionTitle>
+              <div className="space-y-3">
+                {upcoming.map((m) => (
+                  <UpcomingCard key={m.id} match={m} locale={locale} groupName={groupName} />
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Top 3 scorers widget */}
-          <section id="top-scorers" className="rise scroll-mt-24" style={{ "--d": "240ms" }}>
+          <section id="top-scorers" className="rise scroll-mt-24" style={{ "--d": "320ms" }}>
             <SectionTitle
               action={
                 sortedScorers.length > 3 ? (
@@ -234,18 +250,6 @@ export default function Home() {
               </div>
             )}
           </section>
-
-          {/* Upcoming matches */}
-          {upcoming.length > 0 && (
-            <section className="rise" style={{ "--d": "320ms" }}>
-              <SectionTitle>{t("home.upcoming")}</SectionTitle>
-              <div className="space-y-3">
-                {upcoming.map((m) => (
-                  <UpcomingCard key={m.id} match={m} locale={locale} groupName={groupName} />
-                ))}
-              </div>
-            </section>
-          )}
 
           {/* Rules link */}
           <section className="rise" style={{ "--d": "400ms" }}>
