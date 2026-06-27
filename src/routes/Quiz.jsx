@@ -3,8 +3,10 @@ import { useTranslation } from "react-i18next";
 
 import Loader from "../components/ui/Loader.jsx";
 import QuizBackground from "../components/quiz/QuizBackground.jsx";
+import AuthModal from "../components/auth/AuthModal.jsx";
 import { fetchQuiz, answerQuiz } from "../services/quizService";
 import { useAuthStore } from "../store/authStore";
+import { useAuth } from "../hooks/useAuth.js";
 
 const stroke = {
   fill: "none",
@@ -29,6 +31,12 @@ const XIcon = () => (
 const TrophyIcon = () => (
   <svg viewBox="0 0 24 24" {...stroke} className="h-10 w-10">
     <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4ZM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3" />
+  </svg>
+);
+const LockIcon = () => (
+  <svg viewBox="0 0 24 24" {...stroke} className="h-10 w-10">
+    <rect x="5" y="11" width="14" height="9" rx="2" />
+    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
   </svg>
 );
 
@@ -85,8 +93,51 @@ function ArenaHeading() {
   );
 }
 
+// --- Sign-in gate -----------------------------------------------------------
+// The quiz is only playable by signed-in players (so XP can be tracked). When
+// signed out we show this prompt instead of the questions.
+function SignInGate() {
+  const { t } = useTranslation();
+  const [modal, setModal] = useState(null); // null | "signin" | "signup"
+
+  return (
+    <Arena>
+      <ArenaHeading />
+      <div className="rise quiz-glass mx-auto max-w-sm rounded-3xl p-8 text-center">
+        <div className="relative mx-auto mb-6 w-fit">
+          <span className="absolute inset-0 -z-10 rounded-full bg-[rgba(147,51,234,0.4)] blur-2xl" />
+          <span className="grid h-20 w-20 place-items-center rounded-full border border-[rgba(192,132,252,0.6)] bg-[rgba(124,58,237,0.2)] text-[var(--q-p3)] shadow-[0_0_30px_-6px_rgba(192,132,252,0.8)]">
+            <LockIcon />
+          </span>
+        </div>
+        <h2 className="font-display text-2xl font-bold uppercase tracking-wide text-white">
+          {t("quiz.lockTitle")}
+        </h2>
+        <p className="mx-auto mt-2 max-w-xs font-sans text-sm text-purple-100/70">
+          {t("quiz.lockBody")}
+        </p>
+        <div className="mt-7 space-y-3">
+          <button
+            onClick={() => setModal("signin")}
+            className="w-full rounded-2xl bg-[var(--q-p1)] py-3.5 font-display text-sm font-bold uppercase tracking-wide text-white shadow-[0_0_30px_-6px_rgba(147,51,234,0.9)] transition-opacity hover:opacity-90"
+          >
+            {t("auth.signIn")}
+          </button>
+          <button
+            onClick={() => setModal("signup")}
+            className="w-full rounded-2xl border border-[rgba(192,132,252,0.4)] bg-white/[0.03] py-3.5 font-display text-sm font-bold uppercase tracking-wide text-[var(--q-p3)] transition-colors hover:bg-white/[0.06]"
+          >
+            {t("auth.signUp")}
+          </button>
+        </div>
+      </div>
+      {modal !== null && <AuthModal key={modal} initialMode={modal} onClose={() => setModal(null)} />}
+    </Arena>
+  );
+}
+
 // --- Results screen ---------------------------------------------------------
-function Results({ score, total, xpEarned, onRestart }) {
+function Results({ score, total, xpEarned }) {
   const { t } = useTranslation();
   const pct = total ? Math.round((score / total) * 100) : 0;
   const message =
@@ -123,13 +174,6 @@ function Results({ score, total, xpEarned, onRestart }) {
       )}
 
       <p className="mt-4 max-w-xs font-sans text-sm text-purple-100/70">{message}</p>
-
-      <button
-        onClick={onRestart}
-        className="mt-8 rounded-2xl bg-[var(--q-p1)] px-8 py-3 font-display text-sm font-bold uppercase tracking-wide text-white shadow-[0_0_30px_-6px_rgba(147,51,234,0.9)] transition-opacity hover:opacity-90"
-      >
-        {t("quiz.playAgain")}
-      </button>
     </div>
   );
 }
@@ -137,6 +181,7 @@ function Results({ score, total, xpEarned, onRestart }) {
 // --- Quiz flow --------------------------------------------------------------
 export default function Quiz() {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const [questions, setQuestions] = useState(null);
 
   const [step, setStep] = useState(0);
@@ -149,6 +194,7 @@ export default function Quiz() {
   const [finished, setFinished] = useState(false);
 
   useEffect(() => {
+    if (!isAuthenticated) return undefined;
     let active = true;
     fetchQuiz()
       .then((data) => active && setQuestions(data))
@@ -156,7 +202,7 @@ export default function Quiz() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [isAuthenticated]);
 
   // Advance to the next question, or finish on the last one. Stable identity so
   // both the auto-advance timer and tap-to-skip share one code path.
@@ -180,15 +226,10 @@ export default function Quiz() {
     return () => clearTimeout(id);
   }, [answered, step, questions, finishOrNext]);
 
-  const restart = () => {
-    setStep(0);
-    setSelected(null);
-    setAnswered(false);
-    setReveal(null);
-    setScore(0);
-    setXpEarned(0);
-    setFinished(false);
-  };
+  // Quiz is for signed-in players only — show the sign-in prompt otherwise.
+  if (!isAuthenticated) {
+    return <SignInGate />;
+  }
 
   if (questions === null) {
     return (
@@ -213,7 +254,7 @@ export default function Quiz() {
   if (finished) {
     return (
       <Arena>
-        <Results score={score} total={total} xpEarned={xpEarned} onRestart={restart} />
+        <Results score={score} total={total} xpEarned={xpEarned} />
       </Arena>
     );
   }
