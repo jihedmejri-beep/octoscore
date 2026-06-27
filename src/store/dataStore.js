@@ -2,12 +2,54 @@ import { create } from "zustand";
 
 import api from "../services/api";
 
+// Available lineup shapes (rows ordered defense → attack, GK implied).
+export const FORMATIONS = {
+  "3-2-2": [3, 2, 2],
+  "2-2-3": [2, 2, 3],
+  "3-1-1": [3, 1, 1],
+};
+export const DEFAULT_FORMATION = "3-2-2";
+export const FORMATION_OPTIONS = Object.keys(FORMATIONS);
+
+// Build the pitch coordinates (%) for a formation, in placement order:
+// goalkeeper first, then each outfield row from the back to the front.
+function formationSlots(formation) {
+  const rows = FORMATIONS[formation] || FORMATIONS[DEFAULT_FORMATION];
+  const slots = [{ x: 50, y: 90 }]; // goalkeeper
+  const n = rows.length;
+  const yBack = 72; // nearest own goal
+  const yFront = 22; // attacking third
+  rows.forEach((count, r) => {
+    const y = n === 1 ? 50 : yBack - (r * (yBack - yFront)) / (n - 1);
+    for (let i = 0; i < count; i += 1) {
+      slots.push({ x: ((i + 1) / (count + 1)) * 100, y });
+    }
+  });
+  return slots;
+}
+
+// Order starters for the pitch: keeper, then defenders → forwards, then number.
+const POS_RANK = { GK: 0, DEF: 1, MID: 2, FWD: 3 };
+
 // Convert a flat players array into the {starters, sub, coach, captainId} shape
-// the lineup/roster UI expects.
-export function rosterFromPlayers(players = []) {
-  const starters = players
+// the lineup/roster UI expects. When a `formation` is given, starters are
+// auto-placed on the pitch by that shape; otherwise any x/y stored on the
+// player documents is kept (backward compatible).
+export function rosterFromPlayers(players = [], formation) {
+  const ordered = players
     .filter((p) => p.role === "player")
-    .sort((a, b) => (a.number ?? 99) - (b.number ?? 99));
+    .sort((a, b) => {
+      const ra = POS_RANK[a.pos] ?? 9;
+      const rb = POS_RANK[b.pos] ?? 9;
+      if (ra !== rb) return ra - rb;
+      return (a.number ?? 99) - (b.number ?? 99);
+    });
+
+  const slots = formation ? formationSlots(formation) : null;
+  const starters = ordered.map((p, i) =>
+    slots && slots[i] ? { ...p, x: slots[i].x, y: slots[i].y } : p
+  );
+
   const sub = players.find((p) => p.role === "sub") || null;
   const coach = players.find((p) => p.role === "coach") || null;
   const captainId = starters.find((p) => p.isCaptain)?.id || null;

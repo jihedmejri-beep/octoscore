@@ -13,6 +13,12 @@ const teamSchema = new mongoose.Schema(
       publicId: { type: String, default: "" },
     },
     color: { type: String, default: "" }, // optional brand accent
+    // Lineup shape used to auto-place starters on the pitch.
+    formation: {
+      type: String,
+      enum: ["3-2-2", "2-2-3", "3-1-1"],
+      default: "3-2-2",
+    },
   },
   { timestamps: true }
 );

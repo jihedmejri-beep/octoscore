@@ -196,16 +196,18 @@ export default function MatchDetail() {
     ])
       .then(([h, a]) => {
         if (!active) return;
+        const homeFormation = teams.find((tm) => tm.id === match.homeTeamId)?.formation;
+        const awayFormation = teams.find((tm) => tm.id === match.awayTeamId)?.formation;
         setRosters({
-          [match.homeTeamId]: rosterFromPlayers(h),
-          [match.awayTeamId]: rosterFromPlayers(a),
+          [match.homeTeamId]: rosterFromPlayers(h, homeFormation),
+          [match.awayTeamId]: rosterFromPlayers(a, awayFormation),
         });
       })
       .catch(() => {});
     return () => {
       active = false;
     };
-  }, [match]);
+  }, [match, teams]);
 
   if (!loaded) return <Loader />;
 

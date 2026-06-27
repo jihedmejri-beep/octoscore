@@ -32,10 +32,11 @@ export const getTeam = asyncHandler(async (req, res) => {
 
 // POST /api/teams (admin) — multipart form, "logo" file is required.
 export const createTeam = asyncHandler(async (req, res) => {
-  const { name, group, city, color } = req.body;
+  const { name, group, city, color, formation } = req.body;
   if (!req.file) throw new ApiError(400, "A team logo is required");
 
   const data = { name, group, city, color };
+  if (formation !== undefined) data.formation = formation;
   data.logo = await uploadLogo(req.file.buffer);
 
   const team = await Team.create(data);
@@ -48,11 +49,12 @@ export const updateTeam = asyncHandler(async (req, res) => {
   const team = await Team.findById(req.params.id);
   if (!team) throw new ApiError(404, "Team not found");
 
-  const { name, group, city, color } = req.body;
+  const { name, group, city, color, formation } = req.body;
   if (name !== undefined) team.name = name;
   if (group !== undefined) team.group = group;
   if (city !== undefined) team.city = city;
   if (color !== undefined) team.color = color;
+  if (formation !== undefined) team.formation = formation;
 
   if (req.file) {
     if (team.logo?.publicId) await destroyAsset(team.logo.publicId);

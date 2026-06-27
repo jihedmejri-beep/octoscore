@@ -20,8 +20,10 @@ import {
   uploadTeamPhotos,
   deleteTeamPhoto,
 } from "../adminApi.js";
+import { FORMATION_OPTIONS, DEFAULT_FORMATION } from "../../store/dataStore";
 
 const GROUP_COLORS = { A: "#6236FF", B: "#00E5FF", FINAL: "#FFC700" };
+const FORMATION_SELECT = FORMATION_OPTIONS.map((f) => ({ value: f, label: f }));
 
 export default function ManageTeams() {
   const [teams, setTeams] = useState(null);
@@ -42,7 +44,7 @@ export default function ManageTeams() {
   // freshly-opened album instead of silently switching the modal to "Edit".
   const [justCreated, setJustCreated] = useState(false);
 
-  const form = useForm({ name: "", group: "", city: "", color: "" });
+  const form = useForm({ name: "", group: "", city: "", color: "", formation: DEFAULT_FORMATION });
 
   const load = useCallback(() => {
     Promise.all([listTeams(), listGroups()])
@@ -65,7 +67,7 @@ export default function ManageTeams() {
     setPhotos([]);
     setPhotoError("");
     setJustCreated(false);
-    form.setValues({ name: "", group: groups[0]?.id || "", city: "", color: "" });
+    form.setValues({ name: "", group: groups[0]?.id || "", city: "", color: "", formation: DEFAULT_FORMATION });
     setFormError("");
     setModal(true);
   };
@@ -74,7 +76,13 @@ export default function ManageTeams() {
     setLogo(null);
     setPhotoError("");
     setJustCreated(false);
-    form.setValues({ name: team.name, group: team.group, city: team.city || "", color: team.color || "" });
+    form.setValues({
+      name: team.name,
+      group: team.group,
+      city: team.city || "",
+      color: team.color || "",
+      formation: team.formation || DEFAULT_FORMATION,
+    });
     setFormError("");
     setModal(true);
     // Load the team's album.
@@ -128,6 +136,7 @@ export default function ManageTeams() {
       fd.append("group", v.group);
       fd.append("city", v.city);
       fd.append("color", v.color);
+      fd.append("formation", v.formation);
       if (logo) fd.append("logo", logo);
 
       if (editing) {
@@ -240,6 +249,7 @@ export default function ManageTeams() {
             {...form.bind("group")}
           />
           <TextField label="City" {...form.bind("city")} />
+          <SelectField label="Lineup formation" options={FORMATION_SELECT} {...form.bind("formation")} />
           <TextField label="Accent color (hex, optional)" placeholder="#6236FF" {...form.bind("color")} />
 
           <div>

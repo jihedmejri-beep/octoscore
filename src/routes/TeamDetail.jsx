@@ -70,7 +70,7 @@ export default function TeamDetail() {
       .then((data) => {
         if (!active) return;
         setTeam(data);
-        setRoster(rosterFromPlayers(data.players || []));
+        setRoster(rosterFromPlayers(data.players || [], data.formation));
         setStatus("ready");
       })
       .catch(() => active && setStatus("notfound"));
