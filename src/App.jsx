@@ -25,6 +25,7 @@ import ManageGroups from "./admin/pages/ManageGroups.jsx";
 import ManageContent from "./admin/pages/ManageContent.jsx";
 import { useAuthStore } from "./store/authStore";
 import { useDataStore } from "./store/dataStore";
+import { prefetchQuiz } from "./services/quizService";
 import { LANGUAGES } from "./i18n";
 
 export default function App() {
@@ -53,9 +54,11 @@ export default function App() {
   }
 
   // On boot: validate any stored token, then load the live tournament data.
+  // Also warm the quiz cache so opening the Quiz tab is instant later.
   useEffect(() => {
     useAuthStore.getState().hydrate();
     useDataStore.getState().load();
+    prefetchQuiz();
   }, []);
 
   // Keep <html lang> and text direction in sync with the active language so

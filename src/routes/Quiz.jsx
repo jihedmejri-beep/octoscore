@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import Loader from "../components/ui/Loader.jsx";
 import QuizBackground from "../components/quiz/QuizBackground.jsx";
 import AuthModal from "../components/auth/AuthModal.jsx";
-import { fetchQuiz, answerQuiz } from "../services/quizService";
+import { fetchQuiz, answerQuiz, getCachedQuiz } from "../services/quizService";
 import { useAuthStore } from "../store/authStore";
 import { useAuth } from "../hooks/useAuth.js";
 
@@ -182,7 +182,9 @@ function Results({ score, total, xpEarned }) {
 export default function Quiz() {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
-  const [questions, setQuestions] = useState(null);
+  // Seed from the session cache so re-entering the tab is instant.
+  const [questions, setQuestions] = useState(getCachedQuiz);
+  const [loadError, setLoadError] = useState(false);
 
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState(null);
@@ -192,17 +194,20 @@ export default function Quiz() {
   const [score, setScore] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
-    if (!isAuthenticated) return undefined;
+    if (!isAuthenticated || questions !== null) return undefined;
     let active = true;
     fetchQuiz()
       .then((data) => active && setQuestions(data))
-      .catch(() => active && setQuestions([]));
+      .catch(() => active && setLoadError(true));
     return () => {
       active = false;
     };
-  }, [isAuthenticated]);
+    // reloadKey lets the Retry button re-trigger this effect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, reloadKey]);
 
   // Advance to the next question, or finish on the last one. Stable identity so
   // both the auto-advance timer and tap-to-skip share one code path.
@@ -231,6 +236,27 @@ export default function Quiz() {
     return <SignInGate />;
   }
 
+  // Network/cold-start failure — offer a retry instead of an endless spinner.
+  if (questions === null && loadError) {
+    return (
+      <Arena>
+        <ArenaHeading />
+        <div className="quiz-glass mx-auto max-w-sm rounded-3xl p-8 text-center">
+          <p className="font-sans text-sm text-purple-100/80">{t("quiz.loadError")}</p>
+          <button
+            onClick={() => {
+              setLoadError(false);
+              setReloadKey((k) => k + 1);
+            }}
+            className="mt-5 rounded-2xl bg-[var(--q-p1)] px-8 py-3 font-display text-sm font-bold uppercase tracking-wide text-white shadow-[0_0_30px_-6px_rgba(147,51,234,0.9)] transition-opacity hover:opacity-90"
+          >
+            {t("quiz.retry")}
+          </button>
+        </div>
+      </Arena>
+    );
+  }
+
   if (questions === null) {
     return (
       <Arena>
@@ -244,7 +270,7 @@ export default function Quiz() {
       <Arena>
         <ArenaHeading />
         <div className="quiz-glass rounded-3xl p-8 text-center font-mono text-xs uppercase tracking-widest text-purple-100/60">
-          {t("matches.noMatches")}
+          {t("quiz.empty")}
         </div>
       </Arena>
     );
