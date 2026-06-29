@@ -32,6 +32,8 @@ export default defineConfig({
         // API calls (cross-origin to Render) are NOT cached — always fresh data.
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         navigateFallback: '/index.html',
+        // Pull in the web-push handlers (showNotification / notificationclick).
+        importScripts: ['push-sw.js'],
       },
     }),
   ],

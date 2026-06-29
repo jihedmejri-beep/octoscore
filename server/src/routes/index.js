@@ -8,6 +8,7 @@ import matchRoutes from "./matchRoutes.js";
 import galleryRoutes from "./galleryRoutes.js";
 import quizRoutes from "./quizRoutes.js";
 import contentRoutes from "./contentRoutes.js";
+import pushRoutes from "./pushRoutes.js";
 
 const router = Router();
 
@@ -24,6 +25,7 @@ router.get("/", (req, res) =>
       "/api/gallery",
       "/api/quiz",
       "/api/content",
+      "/api/push",
     ],
   })
 );
@@ -36,5 +38,6 @@ router.use("/matches", matchRoutes);
 router.use("/gallery", galleryRoutes);
 router.use("/quiz", quizRoutes);
 router.use("/content", contentRoutes);
+router.use("/push", pushRoutes);
 
 export default router;

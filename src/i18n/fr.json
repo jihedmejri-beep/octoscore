@@ -201,5 +201,13 @@
     "certifiedBy": "Certifié par",
     "madeWith": "Conçu avec passion pour le tournoi",
     "rights": "Tous droits réservés"
+  },
+  "notify": {
+    "enable": "Alertes de match",
+    "on": "Alertes activées — coup d'envoi, buts et fin de match",
+    "off": "Notifications désactivées",
+    "enabled": "Alertes de match activées !",
+    "blocked": "Notifications bloquées — activez-les dans les réglages du navigateur",
+    "unavailable": "Les notifications ne sont pas disponibles sur cet appareil"
   }
 }

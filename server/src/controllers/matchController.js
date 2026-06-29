@@ -3,6 +3,14 @@ import Player from "../models/Player.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import { settleMatchPredictions } from "./predictionController.js";
+import { notifyMatchEvents } from "../services/pushNotifications.js";
+
+// Snapshot the fields that drive notifications, so we can diff before/after.
+const eventSnapshot = (m) => ({
+  status: m?.status,
+  homeScore: m?.homeScore,
+  awayScore: m?.awayScore,
+});
 
 // Award prediction XP when a match is finished; never let it break the response.
 async function trySettle(match) {
@@ -66,6 +74,7 @@ export const createMatch = asyncHandler(async (req, res) => {
 export const updateMatch = asyncHandler(async (req, res) => {
   const prev = await Match.findById(req.params.id);
   if (!prev) throw new ApiError(404, "Match not found");
+  const before = eventSnapshot(prev);
   const match = await Match.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -74,6 +83,7 @@ export const updateMatch = asyncHandler(async (req, res) => {
   // removed and reassigned goals).
   await syncPlayerGoals([...scorerIds(prev), ...scorerIds(match)]);
   await trySettle(match);
+  notifyMatchEvents(before, match); // fire-and-forget push alerts
   res.json(match);
 });
 
@@ -82,6 +92,7 @@ export const updateScore = asyncHandler(async (req, res) => {
   const { homeScore, awayScore, minute, status } = req.body;
   const match = await Match.findById(req.params.id);
   if (!match) throw new ApiError(404, "Match not found");
+  const before = eventSnapshot(match);
 
   if (homeScore !== undefined) match.homeScore = homeScore;
   if (awayScore !== undefined) match.awayScore = awayScore;
@@ -90,6 +101,7 @@ export const updateScore = asyncHandler(async (req, res) => {
   await match.save();
 
   await trySettle(match);
+  notifyMatchEvents(before, match); // fire-and-forget push alerts
   res.json(match);
 });
 

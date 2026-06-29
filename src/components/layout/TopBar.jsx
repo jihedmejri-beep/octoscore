@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 import LanguageSwitcher from "./LanguageSwitcher.jsx";
 import AccountMenu from "./AccountMenu.jsx";
+import NotifyBell from "./NotifyBell.jsx";
 import Search from "../search/Search.jsx";
 import logo from "../../assets/logo.jpeg";
 
@@ -52,6 +53,7 @@ export default function TopBar() {
         {/* Right: language + account */}
         <div className="flex items-center gap-2">
           <Search />
+          <NotifyBell />
           <LanguageSwitcher />
           <AccountMenu />
         </div>

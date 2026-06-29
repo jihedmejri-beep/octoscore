@@ -201,5 +201,13 @@
     "certifiedBy": "Certified by",
     "madeWith": "Built with passion for the tournament",
     "rights": "All rights reserved"
+  },
+  "notify": {
+    "enable": "Match alerts",
+    "on": "Alerts on — you'll get kick-off, goals and full-time",
+    "off": "Notifications off",
+    "enabled": "Match alerts enabled!",
+    "blocked": "Notifications are blocked — enable them in your browser settings",
+    "unavailable": "Notifications aren't available on this device"
   }
 }
