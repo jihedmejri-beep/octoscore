@@ -41,6 +41,9 @@ export const createGroup = (body) => api.post("/groups", body).then((r) => r.dat
 export const updateGroup = (id, body) => api.put(`/groups/${id}`, body).then((r) => r.data);
 export const deleteGroup = (id) => api.delete(`/groups/${id}`).then((r) => r.data);
 
+// --- Push notifications ----------------------------------------------------
+export const sendTestPush = () => api.post("/push/test").then((r) => r.data);
+
 // --- Content singletons (bracket / rules) ----------------------------------
 // ?raw=1 returns the authored bracket without live match scores overlaid, so
 // the admin edits and saves its true source values (see contentController).

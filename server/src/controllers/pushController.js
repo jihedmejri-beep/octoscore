@@ -1,7 +1,7 @@
 import PushSubscription from "../models/PushSubscription.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
-import { pushReady, getPublicKey } from "../services/pushNotifications.js";
+import { pushReady, getPublicKey, sendToAll } from "../services/pushNotifications.js";
 
 // GET /api/push/public-key — the VAPID public key the browser needs to
 // subscribe. Returns enabled:false when notifications aren't configured.
@@ -29,4 +29,20 @@ export const unsubscribe = asyncHandler(async (req, res) => {
   if (!endpoint) throw new ApiError(400, "endpoint is required");
   await PushSubscription.deleteOne({ endpoint });
   res.json({ ok: true });
+});
+
+// POST /api/push/test (admin) — fire a sample notification to every subscriber,
+// so the admin can verify push works without editing a real match.
+export const sendTest = asyncHandler(async (req, res) => {
+  if (!pushReady()) {
+    throw new ApiError(503, "Push notifications are not configured (missing VAPID keys)");
+  }
+  const total = await PushSubscription.estimatedDocumentCount();
+  const sent = await sendToAll({
+    title: "🔔 OctoScore test",
+    body: "Notifications are working — you're all set for match alerts.",
+    url: "/",
+    tag: "octoscore-test",
+  });
+  res.json({ ok: true, total, sent });
 });

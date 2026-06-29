@@ -22,16 +22,17 @@ export const getPublicKey = () => PUBLIC_KEY;
 // browser unsubscribed or expired — 404/410) are pruned so the list stays
 // clean. Best-effort: never throws to the caller.
 export async function sendToAll(payload) {
-  if (!configured) return;
+  if (!configured) return 0;
   let subs;
   try {
     subs = await PushSubscription.find();
   } catch (err) {
     console.error("Push: failed to load subscriptions:", err.message);
-    return;
+    return 0;
   }
   const body = JSON.stringify(payload);
   const dead = [];
+  let sent = 0;
   await Promise.all(
     subs.map(async (sub) => {
       try {
@@ -39,6 +40,7 @@ export async function sendToAll(payload) {
           { endpoint: sub.endpoint, keys: sub.keys },
           body
         );
+        sent += 1;
       } catch (err) {
         if (err.statusCode === 404 || err.statusCode === 410) dead.push(sub.endpoint);
         else console.error("Push send failed:", err.statusCode || err.message);
@@ -48,6 +50,7 @@ export async function sendToAll(payload) {
   if (dead.length) {
     await PushSubscription.deleteMany({ endpoint: { $in: dead } }).catch(() => {});
   }
+  return sent;
 }
 
 const nameCache = new Map();

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../../hooks/useAuth.js";
-import { listTeams, listMatches, listQuizAdmin, listGroups } from "../adminApi.js";
+import { listTeams, listMatches, listQuizAdmin, listGroups, sendTestPush } from "../adminApi.js";
 import { Spinner, ErrorNote } from "../components/AdminTable.jsx";
 
 const CARDS = [
@@ -16,6 +16,25 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [counts, setCounts] = useState(null);
   const [error, setError] = useState("");
+  const [testBusy, setTestBusy] = useState(false);
+  const [testMsg, setTestMsg] = useState(null); // { ok, text }
+
+  const handleTestPush = async () => {
+    setTestBusy(true);
+    setTestMsg(null);
+    try {
+      const { total, sent } = await sendTestPush();
+      setTestMsg(
+        total === 0
+          ? { ok: true, text: "No one has enabled notifications yet — turn on the bell first." }
+          : { ok: true, text: `Sent to ${sent} of ${total} subscribed device${total > 1 ? "s" : ""}.` }
+      );
+    } catch (e) {
+      setTestMsg({ ok: false, text: e.message });
+    } finally {
+      setTestBusy(false);
+    }
+  };
 
   useEffect(() => {
     Promise.all([listTeams(), listMatches(), listQuizAdmin(), listGroups()])
@@ -66,6 +85,39 @@ export default function Dashboard() {
           ))}
         </div>
       )}
+
+      {/* Notifications: fire a sample push to every subscribed device. */}
+      <div className="octo-card mt-6 p-5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="font-display text-sm font-bold uppercase tracking-wide text-white">
+              Match notifications
+            </h3>
+            <p className="mt-1 font-mono text-[11px] text-gray-400">
+              Send a test alert to everyone who enabled the bell.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleTestPush}
+            disabled={testBusy}
+            className="shrink-0 rounded-2xl bg-octo-purple px-5 py-2.5 font-display text-xs font-bold uppercase tracking-wide text-white shadow-glow-purple transition-opacity hover:opacity-90 disabled:opacity-50"
+          >
+            {testBusy ? "Sending…" : "Send test"}
+          </button>
+        </div>
+        {testMsg && (
+          <p
+            className={`mt-3 rounded-xl border px-3 py-2 font-mono text-[11px] ${
+              testMsg.ok
+                ? "border-octo-green/30 bg-octo-green/10 text-octo-green"
+                : "border-red-500/30 bg-red-500/10 text-red-300"
+            }`}
+          >
+            {testMsg.text}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
