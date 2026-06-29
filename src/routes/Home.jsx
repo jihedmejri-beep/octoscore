@@ -251,14 +251,19 @@ export default function Home() {
             )}
           </section>
 
-          {/* Rules link */}
+          {/* Rules link — opens the tournament rules post on Instagram */}
           <section className="rise" style={{ "--d": "400ms" }}>
-            <button className="group flex w-full items-center justify-between rounded-2xl border border-octo-purple/30 bg-gradient-to-r from-octo-purple/10 to-transparent px-4 py-4 text-left transition-colors hover:border-octo-purple/60">
+            <a
+              href="https://www.instagram.com/p/DaK8N5cipI6/"
+              target="_blank"
+              rel="noreferrer"
+              className="group flex w-full items-center justify-between rounded-2xl border border-octo-purple/30 bg-gradient-to-r from-octo-purple/10 to-transparent px-4 py-4 text-left transition-colors hover:border-octo-purple/60"
+            >
               <span className="font-display text-sm font-bold uppercase tracking-wide">
                 {t("home.rules")}
               </span>
               <span className="text-octo-purple transition-transform group-hover:translate-x-1">→</span>
-            </button>
+            </a>
           </section>
 
           {/* Dedication / credits — Home page only */}
