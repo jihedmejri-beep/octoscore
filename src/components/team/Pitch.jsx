@@ -1,4 +1,5 @@
 import GoalBalls from "../ui/GoalBalls.jsx";
+import CardMarks from "../ui/CardMarks.jsx";
 
 // Vertical football pitch graphic that places a team's starting lineup by the
 // x/y coordinates defined on each player (see FORMATION in mockData).
@@ -60,6 +61,11 @@ export default function Pitch({ starters, accent = "#6236FF", onPlayerClick, goa
                 {goals > 0 && (
                   <span className="absolute -right-1.5 -top-1.5">
                     <GoalBalls count={goals} size={14} />
+                  </span>
+                )}
+                {(p.yellowCards > 0 || p.redCards > 0) && (
+                  <span className="absolute -bottom-1 -right-1">
+                    <CardMarks yellow={p.yellowCards} red={p.redCards} size={12} />
                   </span>
                 )}
               </span>
