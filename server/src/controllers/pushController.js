@@ -46,3 +46,20 @@ export const sendTest = asyncHandler(async (req, res) => {
   });
   res.json({ ok: true, total, sent });
 });
+
+// POST /api/push/send (admin) — compose and broadcast a custom notification to
+// every subscriber. A unique tag per send means messages don't collapse into
+// one another on the device.
+export const sendCustom = asyncHandler(async (req, res) => {
+  if (!pushReady()) {
+    throw new ApiError(503, "Push notifications are not configured (missing VAPID keys)");
+  }
+  const title = (req.body?.title || "").trim();
+  const body = (req.body?.body || "").trim();
+  const url = (req.body?.url || "").trim() || "/";
+  if (!title || !body) throw new ApiError(400, "Title and message are required");
+
+  const total = await PushSubscription.estimatedDocumentCount();
+  const sent = await sendToAll({ title, body, url, tag: `octoscore-${Date.now()}` });
+  res.json({ ok: true, total, sent });
+});

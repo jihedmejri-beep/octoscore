@@ -2,8 +2,16 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../../hooks/useAuth.js";
-import { listTeams, listMatches, listQuizAdmin, listGroups, sendTestPush } from "../adminApi.js";
+import {
+  listTeams,
+  listMatches,
+  listQuizAdmin,
+  listGroups,
+  sendTestPush,
+  sendPush,
+} from "../adminApi.js";
 import { Spinner, ErrorNote } from "../components/AdminTable.jsx";
+import { TextField, TextAreaField } from "../components/AdminForm.jsx";
 
 const CARDS = [
   { key: "teams", label: "Teams", to: "/admin/teams", color: "#6236FF" },
@@ -16,23 +24,47 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [counts, setCounts] = useState(null);
   const [error, setError] = useState("");
-  const [testBusy, setTestBusy] = useState(false);
-  const [testMsg, setTestMsg] = useState(null); // { ok, text }
+  const [busy, setBusy] = useState(""); // "" | "send" | "test"
+  const [pushMsg, setPushMsg] = useState(null); // { ok, text }
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [link, setLink] = useState("");
+
+  // Turn a delivery result into the standard "Sent to X of Y devices" message.
+  const deliveryNote = ({ total, sent }) =>
+    total === 0
+      ? { ok: true, text: "No one has enabled notifications yet — turn on the bell first." }
+      : { ok: true, text: `Sent to ${sent} of ${total} subscribed device${total > 1 ? "s" : ""}.` };
 
   const handleTestPush = async () => {
-    setTestBusy(true);
-    setTestMsg(null);
+    setBusy("test");
+    setPushMsg(null);
     try {
-      const { total, sent } = await sendTestPush();
-      setTestMsg(
-        total === 0
-          ? { ok: true, text: "No one has enabled notifications yet — turn on the bell first." }
-          : { ok: true, text: `Sent to ${sent} of ${total} subscribed device${total > 1 ? "s" : ""}.` }
-      );
+      setPushMsg(deliveryNote(await sendTestPush()));
     } catch (e) {
-      setTestMsg({ ok: false, text: e.message });
+      setPushMsg({ ok: false, text: e.message });
     } finally {
-      setTestBusy(false);
+      setBusy("");
+    }
+  };
+
+  const handleSendPush = async () => {
+    if (!title.trim() || !body.trim()) {
+      setPushMsg({ ok: false, text: "Add a title and a message first." });
+      return;
+    }
+    setBusy("send");
+    setPushMsg(null);
+    try {
+      const res = await sendPush({ title: title.trim(), body: body.trim(), url: link.trim() });
+      setPushMsg(deliveryNote(res));
+      setTitle("");
+      setBody("");
+      setLink("");
+    } catch (e) {
+      setPushMsg({ ok: false, text: e.message });
+    } finally {
+      setBusy("");
     }
   };
 
@@ -86,35 +118,68 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Notifications: fire a sample push to every subscribed device. */}
+      {/* Notifications: compose & broadcast a push to every subscribed device. */}
       <div className="octo-card mt-6 p-5">
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h3 className="font-display text-sm font-bold uppercase tracking-wide text-white">
-              Match notifications
-            </h3>
-            <p className="mt-1 font-mono text-[11px] text-gray-400">
-              Send a test alert to everyone who enabled the bell.
-            </p>
-          </div>
+        <h3 className="font-display text-sm font-bold uppercase tracking-wide text-white">
+          Send a notification
+        </h3>
+        <p className="mt-1 font-mono text-[11px] text-gray-400">
+          Push a custom message to everyone who enabled the bell.
+        </p>
+
+        <div className="mt-4 space-y-3">
+          <TextField
+            label="Title"
+            placeholder="e.g. Final tonight! 🏆"
+            maxLength={80}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <TextAreaField
+            label="Message"
+            rows={3}
+            placeholder="What do you want to tell everyone?"
+            maxLength={250}
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+          />
+          <TextField
+            label="Link (optional)"
+            hint="Where tapping the notification opens, e.g. /matches or /tournament. Defaults to the home page."
+            placeholder="/matches"
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+          />
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handleSendPush}
+            disabled={Boolean(busy)}
+            className="rounded-2xl bg-octo-purple px-5 py-2.5 font-display text-xs font-bold uppercase tracking-wide text-white shadow-glow-purple transition-opacity hover:opacity-90 disabled:opacity-50"
+          >
+            {busy === "send" ? "Sending…" : "Send to everyone"}
+          </button>
           <button
             type="button"
             onClick={handleTestPush}
-            disabled={testBusy}
-            className="shrink-0 rounded-2xl bg-octo-purple px-5 py-2.5 font-display text-xs font-bold uppercase tracking-wide text-white shadow-glow-purple transition-opacity hover:opacity-90 disabled:opacity-50"
+            disabled={Boolean(busy)}
+            className="rounded-2xl border border-white/10 px-5 py-2.5 font-display text-xs font-bold uppercase tracking-wide text-gray-300 transition-colors hover:text-white disabled:opacity-50"
           >
-            {testBusy ? "Sending…" : "Send test"}
+            {busy === "test" ? "Sending…" : "Send test"}
           </button>
         </div>
-        {testMsg && (
+
+        {pushMsg && (
           <p
             className={`mt-3 rounded-xl border px-3 py-2 font-mono text-[11px] ${
-              testMsg.ok
+              pushMsg.ok
                 ? "border-octo-green/30 bg-octo-green/10 text-octo-green"
                 : "border-red-500/30 bg-red-500/10 text-red-300"
             }`}
           >
-            {testMsg.text}
+            {pushMsg.text}
           </p>
         )}
       </div>

@@ -213,6 +213,10 @@
     "off": "Notifications off",
     "enabled": "Match alerts enabled!",
     "blocked": "Notifications are blocked — enable them in your browser settings",
-    "unavailable": "Notifications aren't available on this device"
+    "unavailable": "Notifications aren't available on this device",
+    "promptTitle": "Never miss a match",
+    "promptBody": "Get alerts for kick-off, goals and full-time.",
+    "promptEnable": "Enable",
+    "promptDismiss": "Not now"
   }
 }

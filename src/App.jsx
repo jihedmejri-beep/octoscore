@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import useTabSwipe, { TAB_PATHS } from "./hooks/useTabSwipe.js";
 import BottomNav from "./components/layout/BottomNav.jsx";
 import TopBar from "./components/layout/TopBar.jsx";
+import NotifyPrompt from "./components/layout/NotifyPrompt.jsx";
 import ScrollToTopButton from "./components/ui/ScrollToTopButton.jsx";
 import Home from "./routes/Home.jsx";
 import Tournament from "./routes/Tournament.jsx";
@@ -114,6 +115,7 @@ export default function App() {
       </main>
 
       <ScrollToTopButton />
+      <NotifyPrompt />
       <BottomNav />
     </div>
   );

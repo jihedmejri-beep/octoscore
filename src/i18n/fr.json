@@ -213,6 +213,10 @@
     "off": "Notifications désactivées",
     "enabled": "Alertes de match activées !",
     "blocked": "Notifications bloquées — activez-les dans les réglages du navigateur",
-    "unavailable": "Les notifications ne sont pas disponibles sur cet appareil"
+    "unavailable": "Les notifications ne sont pas disponibles sur cet appareil",
+    "promptTitle": "Ne manquez aucun match",
+    "promptBody": "Recevez les alertes coup d'envoi, buts et fin de match.",
+    "promptEnable": "Activer",
+    "promptDismiss": "Plus tard"
   }
 }

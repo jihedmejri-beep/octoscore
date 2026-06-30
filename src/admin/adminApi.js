@@ -43,6 +43,7 @@ export const deleteGroup = (id) => api.delete(`/groups/${id}`).then((r) => r.dat
 
 // --- Push notifications ----------------------------------------------------
 export const sendTestPush = () => api.post("/push/test").then((r) => r.data);
+export const sendPush = (body) => api.post("/push/send", body).then((r) => r.data);
 
 // --- Content singletons (bracket / rules) ----------------------------------
 // ?raw=1 returns the authored bracket without live match scores overlaid, so
