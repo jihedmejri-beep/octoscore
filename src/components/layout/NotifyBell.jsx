@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { pushSupported, isSubscribed, enablePush, disablePush } from "../../services/pushService";
+import { usePushStore } from "../../store/pushStore";
 
 const BellIcon = ({ active }) => (
   <svg viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
@@ -23,16 +23,13 @@ const BellOff = () => (
 // browsers that don't support push (e.g. iOS Safari unless installed).
 export default function NotifyBell() {
   const { t } = useTranslation();
-  const [supported] = useState(pushSupported);
-  const [on, setOn] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const supported = usePushStore((s) => s.supported);
+  const on = usePushStore((s) => s.subscribed);
+  const busy = usePushStore((s) => s.busy);
+  const enable = usePushStore((s) => s.enable);
+  const disable = usePushStore((s) => s.disable);
   const [note, setNote] = useState("");
   const noteTimer = useRef(null);
-
-  useEffect(() => {
-    if (!supported) return;
-    isSubscribed().then(setOn);
-  }, [supported]);
 
   useEffect(() => () => clearTimeout(noteTimer.current), []);
 
@@ -52,28 +49,15 @@ export default function NotifyBell() {
       flash(t("notify.blocked"));
       return;
     }
-    setBusy(true);
-    try {
-      if (on) {
-        await disablePush();
-        setOn(false);
-        flash(t("notify.off"));
-      } else {
-        const res = await enablePush();
-        if (res.ok) {
-          setOn(true);
-          flash(t("notify.enabled"));
-        } else if (res.reason === "denied") {
-          flash(t("notify.blocked"));
-        } else {
-          flash(t("notify.unavailable"));
-        }
-      }
-    } catch {
-      flash(t("notify.unavailable"));
-    } finally {
-      setBusy(false);
+    if (on) {
+      await disable();
+      flash(t("notify.off"));
+      return;
     }
+    const res = await enable();
+    if (res.ok) flash(t("notify.enabled"));
+    else if (res.reason === "denied") flash(t("notify.blocked"));
+    else if (res.reason !== "busy") flash(t("notify.unavailable"));
   };
 
   return (

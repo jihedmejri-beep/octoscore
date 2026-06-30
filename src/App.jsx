@@ -26,6 +26,7 @@ import ManageGroups from "./admin/pages/ManageGroups.jsx";
 import ManageContent from "./admin/pages/ManageContent.jsx";
 import { useAuthStore } from "./store/authStore";
 import { useDataStore } from "./store/dataStore";
+import { usePushStore } from "./store/pushStore";
 import { prefetchQuiz } from "./services/quizService";
 import { LANGUAGES } from "./i18n";
 
@@ -59,6 +60,7 @@ export default function App() {
   useEffect(() => {
     useAuthStore.getState().hydrate();
     useDataStore.getState().load();
+    usePushStore.getState().init();
     prefetchQuiz();
   }, []);
 

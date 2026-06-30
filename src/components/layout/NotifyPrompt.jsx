@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 
-import { pushSupported, enablePush } from "../../services/pushService";
+import { pushSupported } from "../../services/pushService";
+import { usePushStore } from "../../store/pushStore";
 
 // Remembers that we've already asked, so a visitor is nudged at most once.
 const PROMPT_KEY = "octoscore_notify_prompt";
@@ -44,7 +45,8 @@ export default function NotifyPrompt() {
     if (busy) return;
     setBusy(true);
     try {
-      await enablePush();
+      // Goes through the shared store so the header bell flips to "on" at once.
+      await usePushStore.getState().enable();
     } catch {
       /* ignore — they can still use the bell in the header */
     } finally {
