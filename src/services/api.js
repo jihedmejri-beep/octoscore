@@ -16,13 +16,17 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Normalize server errors to a plain Error with the API's message.
+// Normalize server errors to a plain Error with the API's message. The HTTP
+// status is preserved on `err.status` so callers can distinguish a genuine auth
+// rejection (401/403) from a transient network/cold-start failure (status 0).
 api.interceptors.response.use(
   (res) => res,
   (error) => {
     const message =
       error.response?.data?.message || error.message || "Network error — is the API running?";
-    return Promise.reject(new Error(message));
+    const err = new Error(message);
+    err.status = error.response?.status ?? 0; // 0 = no response (offline / timeout)
+    return Promise.reject(err);
   }
 );
 

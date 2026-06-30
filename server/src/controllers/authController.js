@@ -71,9 +71,10 @@ export const login = asyncHandler(async (req, res) => {
   res.json({ token: generateToken(user), user: publicUser(user) });
 });
 
-// GET /api/auth/me
+// GET /api/auth/me — also re-issues a fresh token so an active user's session
+// keeps sliding forward and never silently expires while they keep visiting.
 export const getMe = asyncHandler(async (req, res) => {
-  res.json({ user: publicUser(req.user) });
+  res.json({ user: publicUser(req.user), token: generateToken(req.user) });
 });
 
 // PATCH /api/auth/me
