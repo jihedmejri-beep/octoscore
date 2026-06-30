@@ -16,6 +16,10 @@ const playerSchema = new mongoose.Schema(
     x: { type: Number, default: null }, // pitch position %
     y: { type: Number, default: null },
     goals: { type: Number, default: 0 },
+    // Discipline tallies — kept by hand from the admin panel (unlike goals,
+    // which are derived from match scorers).
+    yellowCards: { type: Number, default: 0, min: 0 },
+    redCards: { type: Number, default: 0, min: 0 },
     isCaptain: { type: Boolean, default: false },
     instagram: { type: String, default: "" },
     facebook: { type: String, default: "" },

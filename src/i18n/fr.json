@@ -22,7 +22,7 @@
     "badge": "Saison 2026 · Classement en Direct",
     "titleTop": "Octopus",
     "titleBottom": "Tournament",
-    "lede": "Le Championnat d'Été 2026 — {{teams}} équipes d'élite s'affrontent dans deux groupes pour un seul trophée. Suivez les scores en direct, le classement et la course au soulier d'or.",
+    "lede": "Le Championnat d'Été 2026 — {{teams}} équipes d'élite s'affrontent pour un seul trophée. Suivez les scores en direct, le classement et la course au soulier d'or.",
     "teams": "Équipes",
     "groups": "Groupes",
     "matches": "Matchs",
@@ -48,7 +48,7 @@
   },
   "tournament": {
     "title": "Championnat Octopus",
-    "subtitle": "Convergence de l'Élite : Sousse vs Teboulba",
+    "subtitle": "La Route vers la Grande Finale",
     "path": "Parcours",
     "quarterfinals": "Quarts de Finale",
     "semifinals": "Demi-finales",
@@ -178,7 +178,9 @@
     "number": "Numéro",
     "position": "Poste",
     "goals": "Buts",
-    "captain": "Capitaine"
+    "captain": "Capitaine",
+    "yellow": "Jaunes",
+    "red": "Rouges"
   },
   "quiz": {
     "question": "Question",

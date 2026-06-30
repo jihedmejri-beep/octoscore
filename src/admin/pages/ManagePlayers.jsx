@@ -62,6 +62,8 @@ export default function ManagePlayers() {
     number: "",
     role: "player",
     pos: "",
+    yellowCards: "",
+    redCards: "",
     isCaptain: false,
     instagram: "",
     facebook: "",
@@ -97,6 +99,8 @@ export default function ManagePlayers() {
       number: "",
       role: "player",
       pos: "",
+      yellowCards: "",
+      redCards: "",
       isCaptain: false,
       instagram: "",
       facebook: "",
@@ -112,6 +116,8 @@ export default function ManagePlayers() {
       number: p.number ?? "",
       role: p.role || "player",
       pos: p.pos || "",
+      yellowCards: p.yellowCards ?? "",
+      redCards: p.redCards ?? "",
       isCaptain: Boolean(p.isCaptain),
       instagram: igHandle(p.instagram),
       facebook: p.facebook || "",
@@ -133,6 +139,8 @@ export default function ManagePlayers() {
         role: v.role,
         pos: v.pos,
         number: v.number === "" ? null : Number(v.number),
+        yellowCards: v.yellowCards === "" ? 0 : Math.max(0, Number(v.yellowCards) || 0),
+        redCards: v.redCards === "" ? 0 : Math.max(0, Number(v.redCards) || 0),
         isCaptain: v.isCaptain,
         instagram: igUrl(v.instagram),
         facebook: v.facebook,
@@ -193,6 +201,8 @@ export default function ManagePlayers() {
                 p.number != null ? `#${p.number}` : null,
                 p.pos || null,
                 p.goals ? `${p.goals} goals` : null,
+                p.yellowCards ? `🟨 ${p.yellowCards}` : null,
+                p.redCards ? `🟥 ${p.redCards}` : null,
               ]
                 .filter(Boolean)
                 .join(" · ")}
@@ -239,6 +249,10 @@ export default function ManagePlayers() {
                 Set automatically from match scorers
               </span>
             </label>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <NumberField label="Yellow cards" min="0" {...form.bind("yellowCards")} />
+            <NumberField label="Red cards" min="0" {...form.bind("redCards")} />
           </div>
           <CheckboxField label="Team captain" {...form.bindCheck("isCaptain")} />
           <TextField

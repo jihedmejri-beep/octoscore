@@ -4,8 +4,7 @@
 // ---------------------------------------------------------------------------
 
 export const GROUPS = [
-  { _id: "A", name: "Sousse", city: "Sousse, Tunisia", order: 0 },
-  { _id: "B", name: "Teboulba", city: "Teboulba, Monastir, Tunisia", order: 1 },
+  { _id: "A", name: "Teboulba", city: "Teboulba, Monastir, Tunisia", order: 0 },
 ];
 
 // No demo teams — the admin adds real teams via the panel. (Kept empty so a
@@ -142,9 +141,9 @@ export const RULES = {
     {
       title: "Format",
       items: [
-        "16 teams split into two groups — Sousse (A) and Teboulba (B).",
-        "Single-elimination knockout: Quarterfinals → Semifinals → Group Final.",
-        "Group winners meet in the Grand Final at a neutral venue.",
+        "All teams compete in a single group held in Teboulba.",
+        "Single-elimination knockout: Quarterfinals → Semifinals → Grand Final.",
+        "The Grand Final crowns the champion.",
       ],
     },
     {

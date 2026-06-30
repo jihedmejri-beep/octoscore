@@ -22,7 +22,7 @@
     "badge": "Season 2026 · Live Standings",
     "titleTop": "Octopus",
     "titleBottom": "Tournament",
-    "lede": "The 2026 Summer Championship — {{teams}} elite teams battle across two groups for one trophy. Follow live scores, standings, and the race for the golden boot.",
+    "lede": "The 2026 Summer Championship — {{teams}} elite teams battle for one trophy. Follow live scores, standings, and the race for the golden boot.",
     "teams": "Teams",
     "groups": "Groups",
     "matches": "Matches",
@@ -48,7 +48,7 @@
   },
   "tournament": {
     "title": "Octopus Championship",
-    "subtitle": "Convergence of the Elite: Sousse vs Teboulba",
+    "subtitle": "The Road to the Grand Final",
     "path": "Path",
     "quarterfinals": "Quarterfinals",
     "semifinals": "Semifinals",
@@ -178,7 +178,9 @@
     "number": "Number",
     "position": "Position",
     "goals": "Goals",
-    "captain": "Captain"
+    "captain": "Captain",
+    "yellow": "Yellow",
+    "red": "Red"
   },
   "quiz": {
     "question": "Question",

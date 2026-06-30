@@ -53,11 +53,25 @@ export default function PlayerModal({ player, teamId, onClose }) {
           </div>
         </div>
 
-        {player.isCaptain && (
-          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-octo-green/30 bg-octo-green/10 px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-octo-green">
-            {t("player.captain")}
-          </div>
-        )}
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {player.isCaptain && (
+            <div className="inline-flex items-center gap-2 rounded-full border border-octo-green/30 bg-octo-green/10 px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-octo-green">
+              {t("player.captain")}
+            </div>
+          )}
+          {player.yellowCards > 0 && (
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-octo-gold/30 bg-octo-gold/10 px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-octo-gold">
+              <span className="h-3.5 w-2.5 rounded-[2px] bg-octo-gold" aria-hidden />
+              {player.yellowCards} {t("player.yellow")}
+            </div>
+          )}
+          {player.redCards > 0 && (
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-red-400">
+              <span className="h-3.5 w-2.5 rounded-[2px] bg-red-500" aria-hidden />
+              {player.redCards} {t("player.red")}
+            </div>
+          )}
+        </div>
 
         {/* Socials */}
         {(player.instagram || player.facebook) && (
