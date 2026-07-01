@@ -1,12 +1,8 @@
 import { create } from "zustand";
 
-// Remembers that the visitor already dealt with the install nudge (installed or
-// dismissed) so we don't pester them on every visit.
-const DISMISS_KEY = "octoscore_install_prompt";
-
 // iOS Safari never fires `beforeinstallprompt` and offers no programmatic
 // install — the only path is the manual "Share → Add to Home Screen". We detect
-// it so we can show instructions instead of a dead install button.
+// it so we can show the steps instead of a dead install button.
 const isIOS = () =>
   typeof navigator !== "undefined" && /iphone|ipad|ipod/i.test(navigator.userAgent);
 
@@ -17,23 +13,17 @@ const isStandalone = () =>
   (window.matchMedia?.("(display-mode: standalone)")?.matches ||
     window.navigator.standalone === true);
 
-const alreadyHandled = () => {
-  try {
-    return !!localStorage.getItem(DISMISS_KEY);
-  } catch {
-    return false;
-  }
-};
-
 // Shared "Add to Home Screen" state. Kept in a store (not local component state)
 // because the browser fires `beforeinstallprompt` once, early — we capture it at
 // import time below — and several surfaces may want to reflect install status.
+// Note: dismissal is intentionally NOT persisted, so the prompt returns on every
+// refresh / open (it only stays hidden once the app is actually installed).
 export const useInstallStore = create((set, get) => ({
   deferred: null, // the captured beforeinstallprompt event (Chromium only)
   canInstall: false, // a native install prompt is ready to fire
   isIOS: isIOS(),
   installed: isStandalone(),
-  dismissed: alreadyHandled(),
+  dismissed: false, // hidden for this page load only — resets on reload
 
   // Fire the native install dialog and report the user's choice
   // ("accepted" | "dismissed" | "unavailable").
@@ -43,24 +33,13 @@ export const useInstallStore = create((set, get) => ({
     e.prompt();
     const choice = await e.userChoice.catch(() => ({ outcome: "dismissed" }));
     set({ deferred: null, canInstall: false });
-    if (choice.outcome === "accepted") {
-      try {
-        localStorage.setItem(DISMISS_KEY, "installed");
-      } catch {
-        /* private mode — nothing to persist */
-      }
-      set({ installed: true });
-    }
+    if (choice.outcome === "accepted") set({ installed: true });
     return choice.outcome;
   },
 
-  // The user closed our banner — remember it so we stop nudging.
+  // The user closed our banner — hide it for this page load only. We deliberately
+  // don't persist this, so the prompt comes back on the next refresh / open.
   dismiss() {
-    try {
-      localStorage.setItem(DISMISS_KEY, "dismissed");
-    } catch {
-      /* private mode — best effort */
-    }
     set({ dismissed: true });
   },
 }));
@@ -77,11 +56,6 @@ function wireInstallEvents() {
     useInstallStore.setState({ deferred: e, canInstall: true });
   });
   window.addEventListener("appinstalled", () => {
-    try {
-      localStorage.setItem(DISMISS_KEY, "installed");
-    } catch {
-      /* ignore */
-    }
     useInstallStore.setState({ deferred: null, canInstall: false, installed: true });
   });
 }

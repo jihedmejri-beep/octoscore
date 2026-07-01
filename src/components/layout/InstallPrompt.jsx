@@ -27,7 +27,8 @@ const ShareIcon = ({ className = "h-5 w-5" }) => (
 // and desktop, the button fires the real `beforeinstallprompt` dialog — a true
 // one-tap install. iOS Safari has no such API, so there the button reveals the
 // two Share-menu steps in place (the only way Apple allows a home-screen add).
-// Never appears in the admin area, once installed, or after it's dismissed.
+// Never appears in the admin area or once installed; a dismiss only hides it for
+// the current visit, so it returns on the next refresh / open.
 export default function InstallPrompt() {
   const { t } = useTranslation();
   const { pathname } = useLocation();
