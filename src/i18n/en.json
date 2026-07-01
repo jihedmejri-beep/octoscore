@@ -223,8 +223,10 @@
     "title": "Install OctoScore",
     "body": "Add it to your home screen for one-tap access and a full-screen app.",
     "button": "Install",
+    "iosButton": "Add to Home Screen",
     "dismiss": "Not now",
-    "iosHint": "Tap the Share button, then \"Add to Home Screen\".",
+    "iosStep1": "Tap the Share button",
+    "iosStep2": "Then \"Add to Home Screen\"",
     "iosDone": "Got it"
   }
 }

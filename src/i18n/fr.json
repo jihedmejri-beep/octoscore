@@ -223,8 +223,10 @@
     "title": "Installer OctoScore",
     "body": "Ajoutez-le à votre écran d'accueil pour un accès en un clic et une appli plein écran.",
     "button": "Installer",
+    "iosButton": "Sur l'écran d'accueil",
     "dismiss": "Plus tard",
-    "iosHint": "Appuyez sur le bouton Partager, puis « Sur l'écran d'accueil ».",
+    "iosStep1": "Appuyez sur le bouton Partager",
+    "iosStep2": "Puis « Sur l'écran d'accueil »",
     "iosDone": "Compris"
   }
 }
