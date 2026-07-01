@@ -31,11 +31,11 @@ export default function PlayerModal({ player, teamId, onClose }) {
   // would otherwise offset it and force you to scroll to find the card).
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-t-3xl border border-white/10 bg-octo-card p-6 shadow-card sm:rounded-3xl"
+        className="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-3xl border border-white/10 bg-octo-card p-6 shadow-card"
         style={{ animation: "fade-up 0.3s cubic-bezier(0.22,1,0.36,1) both" }}
         onClick={(e) => e.stopPropagation()}
       >
