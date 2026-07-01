@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
 import TeamCrest from "../ui/TeamCrest.jsx";
@@ -8,9 +10,26 @@ import { useDataStore } from "../../store/dataStore";
 export default function PlayerModal({ player, teamId, onClose }) {
   const { t } = useTranslation();
   const team = useDataStore((s) => (teamId ? s.teams.find((tm) => tm.id === teamId) : null));
+
+  // Lock background scroll and allow Esc-to-close while the card is open.
+  useEffect(() => {
+    if (!player) return undefined;
+    const onKey = (e) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [player, onClose]);
+
   if (!player) return null;
 
-  return (
+  // Rendered through a portal to <body> so the fixed overlay is positioned
+  // against the viewport, not a transformed page-transition ancestor (which
+  // would otherwise offset it and force you to scroll to find the card).
+  return createPortal(
     <div
       className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center"
       onClick={onClose}
@@ -99,6 +118,7 @@ export default function PlayerModal({ player, teamId, onClose }) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
