@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 
 import { pushSupported } from "../../services/pushService";
 import { usePushStore } from "../../store/pushStore";
+import { useInstallStore } from "../../store/installStore";
 
 // Remembers that we've already asked, so a visitor is nudged at most once.
 const PROMPT_KEY = "octoscore_notify_prompt";
@@ -25,8 +26,16 @@ export default function NotifyPrompt() {
   const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  // The install banner shares this bottom slot and takes priority — hold the
+  // notification nudge until the install one is done (installed/dismissed) so
+  // the two never stack on top of each other.
+  const installPending = useInstallStore(
+    (s) => (s.canInstall || s.isIOS) && !s.installed && !s.dismissed
+  );
+
   useEffect(() => {
     if (pathname.startsWith("/admin")) return undefined;
+    if (installPending) return undefined;
     if (!pushSupported()) return undefined;
     // permission "default" = the user hasn't been asked yet on this device.
     if (typeof Notification !== "undefined" && Notification.permission !== "default") return undefined;
@@ -34,7 +43,7 @@ export default function NotifyPrompt() {
     // Let the page settle before nudging.
     const id = setTimeout(() => setVisible(true), 2200);
     return () => clearTimeout(id);
-  }, [pathname]);
+  }, [pathname, installPending]);
 
   const close = (flag) => {
     if (flag) localStorage.setItem(PROMPT_KEY, flag);

@@ -218,5 +218,13 @@
     "promptBody": "Recevez les alertes coup d'envoi, buts et fin de match.",
     "promptEnable": "Activer",
     "promptDismiss": "Plus tard"
+  },
+  "install": {
+    "title": "Installer OctoScore",
+    "body": "Ajoutez-le à votre écran d'accueil pour un accès en un clic et une appli plein écran.",
+    "button": "Installer",
+    "dismiss": "Plus tard",
+    "iosHint": "Appuyez sur le bouton Partager, puis « Sur l'écran d'accueil ».",
+    "iosDone": "Compris"
   }
 }

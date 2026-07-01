@@ -218,5 +218,13 @@
     "promptBody": "Get alerts for kick-off, goals and full-time.",
     "promptEnable": "Enable",
     "promptDismiss": "Not now"
+  },
+  "install": {
+    "title": "Install OctoScore",
+    "body": "Add it to your home screen for one-tap access and a full-screen app.",
+    "button": "Install",
+    "dismiss": "Not now",
+    "iosHint": "Tap the Share button, then \"Add to Home Screen\".",
+    "iosDone": "Got it"
   }
 }
