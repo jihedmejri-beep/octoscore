@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import Hero from "../components/home/Hero.jsx";
 import TeamCrest from "../components/ui/TeamCrest.jsx";
-import Loader from "../components/ui/Loader.jsx";
+import { HomeSkeleton } from "../components/ui/Skeleton.jsx";
 import Footer from "../components/layout/Footer.jsx";
 import { useDataStore } from "../store/dataStore";
 
@@ -97,20 +97,31 @@ function SectionTitle({ children, action }) {
 }
 
 function ResultCard({ match, groupName }) {
+  // Read-at-a-glance: the winner's score stays white, the loser's dims.
+  const homeLost = match.homeScore < match.awayScore;
+  const awayLost = match.awayScore < match.homeScore;
   return (
-    <div className="octo-card min-w-[240px] p-4 transition duration-300 hover:-translate-y-1 hover:border-octo-purple/30">
+    <div className="octo-card min-w-[240px] snap-start scroll-ml-4 p-4 transition duration-300 hover:-translate-y-1 hover:border-octo-purple/30">
       <div className="label-mono mb-3">
         {groupName(match.group)} · {match.round}
       </div>
       <div className="flex items-center justify-between">
         <TeamBadge teamId={match.homeTeamId} />
-        <span className="shrink-0 pl-2 font-display text-2xl font-bold tabular-nums">
+        <span
+          className={`shrink-0 pl-2 font-display text-2xl font-bold tabular-nums ${
+            homeLost ? "text-gray-600" : ""
+          }`}
+        >
           {match.homeScore}
         </span>
       </div>
       <div className="mt-2 flex items-center justify-between">
         <TeamBadge teamId={match.awayTeamId} />
-        <span className="shrink-0 pl-2 font-display text-2xl font-bold tabular-nums">
+        <span
+          className={`shrink-0 pl-2 font-display text-2xl font-bold tabular-nums ${
+            awayLost ? "text-gray-600" : ""
+          }`}
+        >
           {match.awayScore}
         </span>
       </div>
@@ -118,12 +129,16 @@ function ResultCard({ match, groupName }) {
   );
 }
 
+// Golden-boot podium: gold / silver / bronze for the top three ranks.
+const RANK_COLORS = ["text-octo-gold", "text-gray-300", "text-amber-600"];
+
 function ScorerRow({ scorer, rank }) {
   const { t } = useTranslation();
   const team = useDataStore((s) => s.teams.find((tm) => tm.id === scorer.teamId));
+  const rankColor = RANK_COLORS[rank - 1] ?? "text-gray-500";
   return (
     <div className="-mx-2 flex items-center gap-3 rounded-2xl px-2 py-3 transition-colors hover:bg-white/[0.03]">
-      <span className="w-5 text-center font-mono text-base font-bold text-octo-purple">{rank}</span>
+      <span className={`w-5 text-center font-mono text-base font-bold ${rankColor}`}>{rank}</span>
       <TeamCrest teamId={scorer.teamId} className="h-8 w-8 text-[11px]" />
       <div className="min-w-0 flex-1">
         <div className="truncate font-sans text-sm font-semibold">
@@ -143,7 +158,7 @@ function UpcomingCard({ match, locale, groupName }) {
   return (
     <Link
       to={`/matches/${match.id}`}
-      className="octo-card block p-4 transition duration-300 hover:-translate-y-1 hover:border-octo-purple/30"
+      className="octo-card block p-4 transition duration-300 hover:-translate-y-1 hover:border-octo-purple/30 active:scale-[0.98]"
     >
       <div className="mb-3 flex items-center justify-between">
         <span className="label-mono">
@@ -189,7 +204,7 @@ export default function Home() {
       </section>
 
       {!loaded ? (
-        <Loader />
+        <HomeSkeleton />
       ) : (
         <>
           {/* Live match banner */}
@@ -201,7 +216,7 @@ export default function Home() {
           {recent.length > 0 && (
             <section className="rise" style={{ "--d": "160ms" }}>
               <SectionTitle>{t("home.recentResults")}</SectionTitle>
-              <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
+              <div className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-1">
                 {recent.map((m) => (
                   <ResultCard key={m.id} match={m} groupName={groupName} />
                 ))}
@@ -257,7 +272,7 @@ export default function Home() {
               href="https://www.instagram.com/p/DaK8N5cipI6/"
               target="_blank"
               rel="noreferrer"
-              className="group flex w-full items-center justify-between rounded-2xl border border-octo-purple/30 bg-gradient-to-r from-octo-purple/10 to-transparent px-4 py-4 text-left transition-colors hover:border-octo-purple/60"
+              className="group flex w-full items-center justify-between rounded-2xl border border-octo-purple/30 bg-gradient-to-r from-octo-purple/10 to-transparent px-4 py-4 text-left transition hover:border-octo-purple/60 active:scale-[0.98]"
             >
               <span className="font-display text-sm font-bold uppercase tracking-wide">
                 {t("home.rules")}

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import TeamCrest from "../components/ui/TeamCrest.jsx";
-import Loader from "../components/ui/Loader.jsx";
+import { MatchListSkeleton } from "../components/ui/Skeleton.jsx";
 import { Pin, StatusBadge } from "../components/ui/icons.jsx";
 import { useDataStore } from "../store/dataStore";
 
@@ -40,10 +40,16 @@ function MatchCard({ match }) {
     minute: "2-digit",
   });
 
+  // Finished games read at a glance: the loser's score dims, the winner's
+  // stays white (live scores keep both bright).
+  const finished = match.status === "finished";
+  const homeLost = finished && match.homeScore < match.awayScore;
+  const awayLost = finished && match.awayScore < match.homeScore;
+
   return (
     <Link
       to={`/matches/${match.id}`}
-      className="octo-card block p-4 transition duration-300 hover:-translate-y-1 hover:border-octo-purple/30"
+      className="octo-card block p-4 transition duration-300 hover:-translate-y-1 hover:border-octo-purple/30 active:scale-[0.98]"
     >
       <div className="mb-3 flex items-center justify-between gap-2">
         <span className="label-mono truncate">
@@ -65,9 +71,9 @@ function MatchCard({ match }) {
         <div className="shrink-0 px-1 text-center">
           {played ? (
             <div className="font-display text-2xl font-bold tabular-nums">
-              {match.homeScore}
+              <span className={homeLost ? "text-gray-600" : ""}>{match.homeScore}</span>
               <span className="px-1 text-gray-600">:</span>
-              {match.awayScore}
+              <span className={awayLost ? "text-gray-600" : ""}>{match.awayScore}</span>
             </div>
           ) : (
             <div className="font-display text-sm font-bold text-gray-600">VS</div>
@@ -94,7 +100,6 @@ function MatchCard({ match }) {
   );
 }
 
-const GROUP_FILTERS = ["ALL", "A", "B", "FINAL"];
 const STATUS_FILTERS = ["ALL", "upcoming", "live", "finished"];
 
 export default function Matches() {
@@ -105,6 +110,16 @@ export default function Matches() {
   const matches = useDataStore((s) => s.matches);
   const groups = useDataStore((s) => s.groups);
   const loaded = useDataStore((s) => s.loaded);
+
+  // Group chips come from the live data — no stale hard-coded groups. "Final"
+  // appears only if a match actually uses it, and the whole row hides when
+  // there's nothing to choose between (single group, no finals).
+  const groupFilters = [
+    "ALL",
+    ...[...groups].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)).map((g) => g.id),
+    ...(matches.some((m) => m.group === "FINAL") ? ["FINAL"] : []),
+  ];
+  const showGroupFilters = groupFilters.length > 2;
 
   const groupName = (g) =>
     g === "ALL"
@@ -126,13 +141,15 @@ export default function Matches() {
 
       {/* Filters */}
       <div className="space-y-2">
-        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
-          {GROUP_FILTERS.map((g) => (
-            <FilterChip key={g} active={group === g} onClick={() => setGroup(g)}>
-              {groupName(g)}
-            </FilterChip>
-          ))}
-        </div>
+        {showGroupFilters && (
+          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
+            {groupFilters.map((g) => (
+              <FilterChip key={g} active={group === g} onClick={() => setGroup(g)}>
+                {groupName(g)}
+              </FilterChip>
+            ))}
+          </div>
+        )}
         <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
           {STATUS_FILTERS.map((s) => (
             <FilterChip key={s} active={status === s} onClick={() => setStatus(s)}>
@@ -144,7 +161,7 @@ export default function Matches() {
 
       {/* List */}
       {!loaded ? (
-        <Loader />
+        <MatchListSkeleton />
       ) : filtered.length > 0 ? (
         <div className="space-y-3">
           {filtered.map((m, i) => (

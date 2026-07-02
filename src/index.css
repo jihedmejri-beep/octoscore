@@ -16,6 +16,15 @@
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 5rem;
+    /* Kill the grey/blue flash mobile browsers paint on tap — we provide our
+       own press feedback (active:scale) on every interactive card. */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Brand-tinted text selection instead of the default blue */
+  ::selection {
+    background: rgba(98, 54, 255, 0.45);
+    color: #fff;
   }
 
   body {

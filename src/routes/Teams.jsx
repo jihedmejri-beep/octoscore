@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import TeamCrest from "../components/ui/TeamCrest.jsx";
-import Loader from "../components/ui/Loader.jsx";
+import { TeamGridSkeleton } from "../components/ui/Skeleton.jsx";
 import { useDataStore } from "../store/dataStore";
 
 // Accent palette cycled by the group's position, so any set of groups gets a
@@ -17,6 +17,8 @@ const GROUP_BADGE = [
 
 function GroupBadge({ group }) {
   const groups = useDataStore((s) => s.groups);
+  // With a single group every card would repeat the same name — say nothing.
+  if (groups.length < 2) return null;
   const idx = groups.findIndex((g) => g.id === group);
   const name = groups[idx]?.name ?? group;
   const cls = GROUP_BADGE[(idx < 0 ? 0 : idx) % GROUP_BADGE.length];
@@ -33,7 +35,7 @@ function TeamCard({ team }) {
   return (
     <Link
       to={`/teams/${team.id}`}
-      className="octo-card flex flex-col items-center gap-3 p-5 text-center transition duration-300 hover:-translate-y-1 hover:border-octo-purple/30"
+      className="octo-card flex flex-col items-center gap-3 p-5 text-center transition duration-300 hover:-translate-y-1 hover:border-octo-purple/30 active:scale-[0.98]"
     >
       <TeamCrest teamId={team.id} name={team.name} className="h-16 w-16 text-lg" />
       <div>
@@ -70,26 +72,28 @@ export default function Teams() {
           {t("nav.teams")}
         </h1>
 
-        {/* Group filter */}
-        <div className="flex gap-2">
-          {FILTERS.map((g) => (
-            <button
-              key={g}
-              onClick={() => setGroup(g)}
-              className={`rounded-full border px-4 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider transition-colors ${
-                group === g
-                  ? "border-octo-purple bg-octo-purple/15 text-white"
-                  : "border-white/10 bg-octo-card text-gray-400 hover:text-white"
-              }`}
-            >
-              {filterLabel(g)}
-            </button>
-          ))}
-        </div>
+        {/* Group filter — pointless with a single group, so it hides itself */}
+        {groups.length > 1 && (
+          <div className="flex gap-2">
+            {FILTERS.map((g) => (
+              <button
+                key={g}
+                onClick={() => setGroup(g)}
+                className={`rounded-full border px-4 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider transition-colors ${
+                  group === g
+                    ? "border-octo-purple bg-octo-purple/15 text-white"
+                    : "border-white/10 bg-octo-card text-gray-400 hover:text-white"
+                }`}
+              >
+                {filterLabel(g)}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Grid */}
         {!loaded ? (
-          <Loader />
+          <TeamGridSkeleton />
         ) : teams.length === 0 ? (
           <div className="octo-card p-8 text-center font-mono text-xs uppercase tracking-widest text-gray-500">
             {t("teams.notFound")}

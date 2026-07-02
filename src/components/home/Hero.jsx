@@ -28,14 +28,21 @@ function Octopus({ className = "h-10 w-10" }) {
 export default function Hero() {
   const { t } = useTranslation();
   const teamCount = useDataStore((s) => s.teams.length);
-  const groupCount = useDataStore((s) => s.groups.length);
-  const matchCount = useDataStore((s) => s.matches.length);
+  const matches = useDataStore((s) => s.matches);
+
+  // Total goals across every played match — a stat that actually moves during
+  // the tournament (the old group count was frozen at 1).
+  const goalCount = matches.reduce(
+    (n, m) =>
+      m.status === "upcoming" ? n : n + (m.homeScore ?? 0) + (m.awayScore ?? 0),
+    0
+  );
 
   // Headline stats are derived from the data so the copy never drifts.
   const stats = [
     { value: teamCount, label: t("hero.teams") },
-    { value: groupCount, label: t("hero.groups") },
-    { value: matchCount, label: t("hero.matches") },
+    { value: matches.length, label: t("hero.matches") },
+    { value: goalCount, label: t("hero.goals") },
   ];
 
   // Reveal the Top Scorers widget already rendered further down the page.
@@ -102,14 +109,14 @@ export default function Hero() {
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
           <Link
             to="/tournament"
-            className="inline-flex items-center justify-center rounded-2xl bg-octo-purple px-6 py-3.5 font-display text-sm font-bold uppercase tracking-wide text-white shadow-glow-purple transition-transform hover:-translate-y-0.5"
+            className="inline-flex items-center justify-center rounded-2xl bg-octo-purple px-6 py-3.5 font-display text-sm font-bold uppercase tracking-wide text-white shadow-glow-purple transition-transform hover:-translate-y-0.5 active:scale-95"
           >
             {t("hero.ctaStandings")}
           </Link>
           <button
             type="button"
             onClick={scrollToScorers}
-            className="group inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.02] px-6 py-3.5 font-display text-sm font-bold uppercase tracking-wide text-white transition-colors hover:border-octo-purple/60"
+            className="group inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.02] px-6 py-3.5 font-display text-sm font-bold uppercase tracking-wide text-white transition hover:border-octo-purple/60 active:scale-95"
           >
             {t("hero.ctaScorers")}
             <span className="transition-transform group-hover:translate-x-1">→</span>
