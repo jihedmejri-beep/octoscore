@@ -58,11 +58,26 @@ export default function App() {
 
   // On boot: validate any stored token, then load the live tournament data.
   // Also warm the quiz cache so opening the Quiz tab is instant later.
+  // While the tab stays open, refetch the fast-moving data (scores, live
+  // clocks, scorers) every 45s — and immediately when the tab regains focus —
+  // so a live match updates without anyone pulling to refresh.
   useEffect(() => {
     useAuthStore.getState().hydrate();
     useDataStore.getState().load();
     usePushStore.getState().init();
     prefetchQuiz();
+
+    const tick = setInterval(() => {
+      if (document.visibilityState === "visible") useDataStore.getState().refresh();
+    }, 45000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") useDataStore.getState().refresh();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(tick);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
   // Keep <html lang> and text direction in sync with the active language so

@@ -1,3 +1,5 @@
+import useLiveClock from "../../hooks/useLiveClock.js";
+
 // Shared outline icons (stroke = currentColor). No emojis anywhere.
 const base = {
   viewBox: "0 0 24 24",
@@ -61,13 +63,16 @@ export const Whistle = ({ className = "h-4 w-4" }) => (
   </svg>
 );
 
-// Live / status badge
-export function StatusBadge({ status, minute }) {
+// Live / status badge. When the match carries a kickoff timestamp the badge
+// shows the running 00:00→90:00 clock, ticking every second; otherwise it
+// falls back to the manually-entered minute.
+export function StatusBadge({ status, minute, kickoffAt }) {
+  const clock = useLiveClock(status === "live" ? kickoffAt : null);
   if (status === "live") {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full bg-octo-green/15 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-octo-green">
         <span className="h-1.5 w-1.5 animate-pulse-live rounded-full bg-octo-green" />
-        Live{minute ? ` ${minute}'` : ""}
+        Live{clock ? ` ${clock.label}` : minute ? ` ${minute}'` : ""}
       </span>
     );
   }

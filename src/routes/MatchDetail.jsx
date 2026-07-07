@@ -233,14 +233,24 @@ export default function MatchDetail() {
     minute: "2-digit",
   });
 
-  // Split the recorded scorers into the two teams (resolved to player names).
-  const homeScorers = [];
-  const awayScorers = [];
+  // Split the recorded scorers into the two teams (resolved to player names),
+  // one line per player with their goal minutes collected ("Name 12' 47'").
+  const byPlayer = new Map();
   for (const s of match.scorers || []) {
     const info = playerIndex[s.playerId];
     if (!info) continue;
-    const entry = { id: s.playerId, name: info.name, goals: s.goals || 1 };
-    (info.teamId === match.homeTeamId ? homeScorers : awayScorers).push(entry);
+    const entry =
+      byPlayer.get(s.playerId) ||
+      { id: s.playerId, name: info.name, teamId: info.teamId, goals: 0, minutes: [] };
+    entry.goals += s.goals || 1;
+    if (s.minute != null) entry.minutes.push(s.minute);
+    byPlayer.set(s.playerId, entry);
+  }
+  const homeScorers = [];
+  const awayScorers = [];
+  for (const entry of byPlayer.values()) {
+    entry.minutes.sort((a, b) => a - b);
+    (entry.teamId === match.homeTeamId ? homeScorers : awayScorers).push(entry);
   }
   const hasScorers = homeScorers.length > 0 || awayScorers.length > 0;
 
@@ -258,7 +268,7 @@ export default function MatchDetail() {
       {/* Score header */}
       <div className="rise relative overflow-hidden rounded-3xl border border-octo-purple/30 bg-gradient-to-b from-octo-purple/15 via-octo-card to-octo-card p-6 shadow-card">
         <div className="mb-5 flex justify-center">
-          <StatusBadge status={match.status} minute={match.minute} />
+          <StatusBadge status={match.status} minute={match.minute} kickoffAt={match.kickoffAt} />
         </div>
         <div className="flex items-center justify-between gap-3">
           <Link to={`/teams/${match.homeTeamId}`} className="flex flex-1 flex-col items-center gap-2.5">
@@ -291,7 +301,11 @@ export default function MatchDetail() {
                   <GoalBalls count={s.goals} size={11} />
                   <span className="truncate font-sans text-xs text-gray-300">
                     {s.name}
-                    {s.goals > 1 && <span className="text-gray-500"> ×{s.goals}</span>}
+                    {s.minutes.length > 0 ? (
+                      <span className="font-mono text-gray-500"> {s.minutes.map((m) => `${m}'`).join(" ")}</span>
+                    ) : (
+                      s.goals > 1 && <span className="text-gray-500"> ×{s.goals}</span>
+                    )}
                   </span>
                 </div>
               ))}
@@ -301,7 +315,11 @@ export default function MatchDetail() {
                 <div key={s.id} className="flex items-center justify-end gap-1.5">
                   <span className="truncate text-right font-sans text-xs text-gray-300">
                     {s.name}
-                    {s.goals > 1 && <span className="text-gray-500"> ×{s.goals}</span>}
+                    {s.minutes.length > 0 ? (
+                      <span className="font-mono text-gray-500"> {s.minutes.map((m) => `${m}'`).join(" ")}</span>
+                    ) : (
+                      s.goals > 1 && <span className="text-gray-500"> ×{s.goals}</span>
+                    )}
                   </span>
                   <GoalBalls count={s.goals} size={11} />
                 </div>

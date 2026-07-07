@@ -25,6 +25,7 @@ import {
   listGroups,
   listPlayers,
 } from "../adminApi.js";
+import { liveMinuteNow } from "../../hooks/useLiveClock.js";
 
 const STATUS_OPTS = [
   { value: "upcoming", label: "Upcoming" },
@@ -119,7 +120,13 @@ export default function ManageMatches() {
   };
   const openEdit = (m) => {
     setEditing(m);
-    setScorers((m.scorers || []).map((s) => ({ playerId: s.playerId, goals: s.goals ?? 1 })));
+    setScorers(
+      (m.scorers || []).map((s) => ({
+        playerId: s.playerId,
+        goals: s.goals ?? 1,
+        minute: s.minute ?? "",
+      }))
+    );
     form.setValues({
       homeTeamId: m.homeTeamId,
       awayTeamId: m.awayTeamId,
@@ -149,7 +156,13 @@ export default function ManageMatches() {
       label: `${p.first} ${p.last} · ${teamName(p.teamId)}`,
     })),
   ];
-  const addScorer = () => setScorers((s) => [...s, { playerId: "", goals: 1 }]);
+  // New goals on a live match are stamped with the current clock minute
+  // (editable afterwards, e.g. to log a goal you entered late).
+  const addScorer = () => {
+    const auto =
+      form.values.status === "live" ? liveMinuteNow(editing?.kickoffAt) : null;
+    setScorers((s) => [...s, { playerId: "", goals: 1, minute: auto ?? "" }]);
+  };
   const setScorer = (i, patch) =>
     setScorers((s) => s.map((row, idx) => (idx === i ? { ...row, ...patch } : row)));
   const removeScorer = (i) => setScorers((s) => s.filter((_, idx) => idx !== i));
@@ -180,7 +193,14 @@ export default function ManageMatches() {
         liveLink: v.liveLink || null,
         scorers: scorers
           .filter((s) => s.playerId)
-          .map((s) => ({ playerId: s.playerId, goals: Math.max(1, Number(s.goals) || 1) })),
+          .map((s) => ({
+            playerId: s.playerId,
+            goals: Math.max(1, Number(s.goals) || 1),
+            minute:
+              s.minute === "" || s.minute === null || s.minute === undefined
+                ? null
+                : Math.min(120, Math.max(0, Number(s.minute) || 0)),
+          })),
       };
       if (editing) await updateMatch(editing.id, body);
       else await createMatch(body);
@@ -310,12 +330,21 @@ export default function ManageMatches() {
                         onChange={(e) => setScorer(i, { playerId: e.target.value })}
                       />
                     </div>
-                    <div className="w-20">
+                    <div className="w-16">
                       <NumberField
                         label="Goals"
                         min="1"
                         value={s.goals}
                         onChange={(e) => setScorer(i, { goals: e.target.value })}
+                      />
+                    </div>
+                    <div className="w-16">
+                      <NumberField
+                        label="Min"
+                        min="0"
+                        max="120"
+                        value={s.minute}
+                        onChange={(e) => setScorer(i, { minute: e.target.value })}
                       />
                     </div>
                     <button

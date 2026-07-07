@@ -89,6 +89,21 @@ export const useDataStore = create((set) => ({
       set({ error: e.message, loaded: true });
     }
   },
+
+  // Light refetch of the fast-moving data (live scores, clocks, scorers) so
+  // the app stays current while it's open. Failures are silent — we keep
+  // showing what we have and try again on the next tick.
+  async refresh() {
+    try {
+      const [matches, topScorers] = await Promise.all([
+        api.get("/matches").then((r) => r.data),
+        api.get("/players/top", { params: { limit: 20 } }).then((r) => r.data).catch(() => null),
+      ]);
+      set((s) => ({ matches, topScorers: topScorers ?? s.topScorers }));
+    } catch {
+      /* transient network error — retry on the next interval */
+    }
+  },
 }));
 
 // Selector helpers.

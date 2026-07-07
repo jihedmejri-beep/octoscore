@@ -6,6 +6,7 @@ import Hero from "../components/home/Hero.jsx";
 import TeamCrest from "../components/ui/TeamCrest.jsx";
 import { HomeSkeleton } from "../components/ui/Skeleton.jsx";
 import Footer from "../components/layout/Footer.jsx";
+import useLiveClock from "../hooks/useLiveClock.js";
 import { useDataStore } from "../store/dataStore";
 
 // --- Small presentational helpers -----------------------------------------
@@ -40,6 +41,9 @@ function TeamBadge({ teamId, align = "left" }) {
 
 function LiveBanner({ match, groupName }) {
   const { t } = useTranslation();
+  // Ticking 00:00→90:00 clock from the kickoff timestamp (falls back to the
+  // manual minute for matches set live before the clock existed).
+  const clock = useLiveClock(match?.status === "live" ? match.kickoffAt : null);
   if (!match) {
     return (
       <div className="octo-card p-5 text-center font-mono text-xs uppercase tracking-widest text-gray-500">
@@ -53,7 +57,7 @@ function LiveBanner({ match, groupName }) {
       <div className="mb-4 flex items-center justify-between">
         <span className="inline-flex items-center gap-2 rounded-full bg-octo-green/15 px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-octo-green">
           <span className="h-2 w-2 animate-pulse-live rounded-full bg-octo-green" />
-          {t("home.liveNow")} · {match.minute}'
+          {t("home.liveNow")} · {clock ? clock.label : `${match.minute ?? 0}'`}
         </span>
         <span className="font-mono text-[11px] uppercase tracking-wider text-gray-500">
           {groupName(match.group)}

@@ -55,7 +55,7 @@ function MatchCard({ match }) {
         <span className="label-mono truncate">
           {groupLabel} · {match.round}
         </span>
-        <StatusBadge status={match.status} minute={match.minute} />
+        <StatusBadge status={match.status} minute={match.minute} kickoffAt={match.kickoffAt} />
       </div>
 
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-3">
